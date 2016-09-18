@@ -35,6 +35,8 @@ namespace Logic {
         TruthTableVariablesUInt operator--(int);
         TruthTableVariablesUInt &operator+=(const TruthTableVariablesUInt &rhs);
         TruthTableVariablesUInt &operator-=(const TruthTableVariablesUInt &rhs);
+
+        // Using this instead of templates so as to use the "==" operator
         bool operator==(const TruthTableVariablesUInt &rhs) const;
         bool operator==(const int32_t &rhs) const;
         bool operator==(const int64_t &rhs) const;
@@ -42,14 +44,23 @@ namespace Logic {
         bool operator==(const uint64_t &rhs) const;
 
         template <typename TException>
-        static void assertFits(const TruthTableUInt value);
+        static void assertFits(const uint64_t value);
 
     private:
         uint8_t value;
     };
 
+    // Using this instead of templates so as to use the "+/-" operators
     TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const TruthTableVariablesUInt &rhs);
+    TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const int32_t &rhs);
+    TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const int64_t &rhs);
+    TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const uint32_t &rhs);
+    TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const uint64_t &rhs);
     TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const TruthTableVariablesUInt &rhs);
+    TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const int32_t &rhs);
+    TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const int64_t &rhs);
+    TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const uint32_t &rhs);
+    TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const uint64_t &rhs);
     ostream &operator<<(ostream &os, const TruthTableVariablesUInt &val);
     istream &operator>>(istream &is, TruthTableVariablesUInt &val);
 
