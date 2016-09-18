@@ -10,10 +10,40 @@
 using namespace std;
 
 namespace Logic {
+#define MAX_NUM_VARIABLES 64
+
     class __TruthTableValueProxy;
 
-    // TODO: max uint (64 bits) => max size of table == 2**64.
-    // TODO: Thus, max number of variables == 64. num variables can be stored in a uint8_t
+    typedef uint64_t TruthTableUInt;
+
+    class TruthTableVariablesUInt {
+    public:
+        TruthTableVariablesUInt(const uint8_t value) : value(value) {
+            assertFits(value);
+        }
+
+        TruthTableVariablesUInt() : value(0) {
+        }
+
+        operator uint8_t() const {
+            return value;
+        }
+
+        TruthTableVariablesUInt &operator++();
+        TruthTableVariablesUInt operator++(int);
+        TruthTableVariablesUInt &operator+=(const TruthTableVariablesUInt &rhs);
+        bool operator==(const TruthTableVariablesUInt &rhs) const;
+        static void assertFits(const TruthTableUInt value);
+
+    private:
+        uint8_t value;
+    };
+
+    TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const TruthTableVariablesUInt &rhs);
+    TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const TruthTableVariablesUInt &rhs);
+    ostream &operator<<(ostream &os, const TruthTableVariablesUInt &val);
+    istream &operator>>(istream &is, TruthTableVariablesUInt &val);
+
     class TruthTable {
     public:
         TruthTable(const vector<string> &variables);
@@ -22,13 +52,13 @@ namespace Logic {
             return variables;
         }
 
-        uint64_t size() const {
-            return (uint64_t) pow(2, variables.size());
+        TruthTableUInt size() const {
+            return (TruthTableUInt) pow(2, variables.size());
         }
 
-        __TruthTableValueProxy operator[](const uint64_t index);
+        __TruthTableValueProxy operator[](const TruthTableUInt index);
 
-        bool operator[](const uint64_t index) const;
+        bool operator[](const TruthTableUInt index) const;
 
     private:
         const vector<string> variables;
@@ -39,9 +69,10 @@ namespace Logic {
         friend class __TruthTableValueProxy;
     };
 
+    // This type should not be used directly by keeping a variable. It should be either converted to a bool, or used for assignment.
     class __TruthTableValueProxy {
     public:
-        __TruthTableValueProxy(const uint64_t index, TruthTable &table) : index(index), table(table) {
+        __TruthTableValueProxy(const TruthTableUInt index, TruthTable &table) : index(index), table(table) {
         }
 
         operator bool() const {
@@ -53,13 +84,15 @@ namespace Logic {
         }
 
     private:
-        const uint64_t index;
+        const TruthTableUInt index;
         TruthTable &table;
     };
 
+    ostream &operator<<(ostream &os, const __TruthTableValueProxy &val);
+
     class TruthTableBuilder {
     public:
-        void set(uint64_t lineIndex, const bool b);
+        void set(TruthTableUInt lineIndex, const bool b);
 
         void setVariables(const vector<string> &variables) {
             this->variables = variables;
@@ -83,5 +116,14 @@ namespace Logic {
 
     private:
         const char* message;
+    };
+}
+
+namespace std {
+    template<>
+    struct hash<Logic::TruthTableVariablesUInt> {
+        size_t operator()(const Logic::TruthTableVariablesUInt &val) const {
+            return (uint8_t)val;
+        }
     };
 }
