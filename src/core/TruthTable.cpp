@@ -7,34 +7,76 @@ bool isPowerOfTwo(TruthTableUInt n) {
     return (n > 0) && ((n & (n - 1)) == 0);
 }
 
+template <typename TException>
 void TruthTableVariablesUInt::assertFits(const TruthTableUInt value) {
     if (value > MAX_NUM_VARIABLES) {
-        throw out_of_range("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
+        throw TException("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
     }
 }
 
 TruthTableVariablesUInt &TruthTableVariablesUInt::operator++() {
     ++value;
-    assertFits(value);
+    assertFits<overflow_error>(value);
     return *this;
 }
 
 TruthTableVariablesUInt TruthTableVariablesUInt::operator++(int) {
     TruthTableVariablesUInt temp(*this);
     ++value;
-    assertFits(value);
+    assertFits<overflow_error>(value);
+    return temp;
+}
+
+TruthTableVariablesUInt &TruthTableVariablesUInt::operator--() {
+    if (value == 0) {
+        throw underflow_error("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
+    }
+    --value;
+    return *this;
+}
+
+TruthTableVariablesUInt TruthTableVariablesUInt::operator--(int) {
+    if (value == 0) {
+        throw underflow_error("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
+    }
+    TruthTableVariablesUInt temp(*this);
+    --value;
     return temp;
 }
 
 TruthTableVariablesUInt &TruthTableVariablesUInt::operator+=(const TruthTableVariablesUInt &rhs) {
     uint32_t added = (uint32_t) value + (uint32_t) rhs.value;
-    assertFits(added);
+    assertFits<overflow_error>(added);
     value = (uint8_t) added;
+    return *this;
+}
+
+TruthTableVariablesUInt &TruthTableVariablesUInt::operator-=(const TruthTableVariablesUInt &rhs) {
+    if (rhs.value > value) {
+        throw underflow_error("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
+    }
+    value = value - rhs.value;
     return *this;
 }
 
 bool TruthTableVariablesUInt::operator==(const TruthTableVariablesUInt &rhs) const {
     return value == rhs.value;
+}
+
+bool TruthTableVariablesUInt::operator==(const int32_t &rhs) const {
+    return (int32_t) value == rhs;
+}
+
+bool TruthTableVariablesUInt::operator==(const int64_t &rhs) const {
+    return (int64_t) value == rhs;
+}
+
+bool TruthTableVariablesUInt::operator==(const uint32_t &rhs) const {
+    return (uint32_t) value == rhs;
+}
+
+bool TruthTableVariablesUInt::operator==(const uint64_t &rhs) const {
+    return (uint64_t) value == rhs;
 }
 
 TruthTable::TruthTable(const vector<string> &variables) : variables(variables), values(variables.size(), false) {
@@ -87,18 +129,16 @@ void TruthTableBuilder::set(TruthTableUInt lineIndex, const bool b) {
 namespace Logic {
     TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const TruthTableVariablesUInt &rhs) {
         uint32_t added = (uint8_t) lhs + (uint8_t) rhs;
-        TruthTableVariablesUInt::assertFits(added);
+        TruthTableVariablesUInt::assertFits<overflow_error>(added);
         return TruthTableVariablesUInt((uint8_t) added);
     }
 
     TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const TruthTableVariablesUInt &rhs) {
         if (rhs > lhs) {
-            throw underflow_error("lhs - rhs leads to a negative number. Not allowed.");
+            throw underflow_error("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
         }
 
-        uint32_t subtracted = (uint8_t) lhs - (uint8_t) rhs;
-        TruthTableVariablesUInt::assertFits(subtracted);
-        return TruthTableVariablesUInt((uint8_t) subtracted);
+        return TruthTableVariablesUInt((uint8_t) lhs - (uint8_t) rhs);
     }
 
     ostream &operator<<(ostream &os, const TruthTableVariablesUInt &val) {
@@ -109,7 +149,7 @@ namespace Logic {
     istream &operator>>(istream &is, TruthTableVariablesUInt &val) {
         uint32_t intVal;
         is >> intVal;
-        TruthTableVariablesUInt::assertFits(intVal);
+        TruthTableVariablesUInt::assertFits<out_of_range>(intVal);
         val = (uint8_t) intVal;
         return is;
     }

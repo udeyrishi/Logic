@@ -19,7 +19,7 @@ namespace Logic {
     class TruthTableVariablesUInt {
     public:
         TruthTableVariablesUInt(const uint8_t value) : value(value) {
-            assertFits(value);
+            assertFits<out_of_range>(value);
         }
 
         TruthTableVariablesUInt() : value(0) {
@@ -31,8 +31,17 @@ namespace Logic {
 
         TruthTableVariablesUInt &operator++();
         TruthTableVariablesUInt operator++(int);
+        TruthTableVariablesUInt &operator--();
+        TruthTableVariablesUInt operator--(int);
         TruthTableVariablesUInt &operator+=(const TruthTableVariablesUInt &rhs);
+        TruthTableVariablesUInt &operator-=(const TruthTableVariablesUInt &rhs);
         bool operator==(const TruthTableVariablesUInt &rhs) const;
+        bool operator==(const int32_t &rhs) const;
+        bool operator==(const int64_t &rhs) const;
+        bool operator==(const uint32_t &rhs) const;
+        bool operator==(const uint64_t &rhs) const;
+
+        template <typename TException>
         static void assertFits(const TruthTableUInt value);
 
     private:
