@@ -2,8 +2,8 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src/core/BooleanFunction.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/core/TruthTable.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/core/BooleanFunction.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Main.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/inc/core/operators/BinaryOperator.hpp" isTestSource="false" />
@@ -11,6 +11,7 @@
       <sourceFolder url="file://$MODULE_DIR$/inc/core/BooleanFunction.hpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/inc/core/TruthTable.hpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/inc/catch.hpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/test/core/TruthTableTests.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test/runner.cpp" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
