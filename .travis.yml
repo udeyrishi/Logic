@@ -42,15 +42,7 @@ matrix:
       env: COMPILER=clang++-3.8
 
 script:
-  - mkdir Release
-  - mkdir Debug
-  - cd Release
-  - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=$COMPILER ..
-  - make
-  - cd ..
-  - cd Debug
-  - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$COMPILER ..
-  - make
-  - ./bin/run_tests
-  - cd ../Release
-  - ./bin/run_tests
+  - ./build.py
+  - ./build.py -d
+  - ./debug/bin/run_tests
+  - ./release/bin/run_tests
