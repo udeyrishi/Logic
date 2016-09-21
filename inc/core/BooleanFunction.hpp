@@ -1,8 +1,7 @@
 #pragma once
 
 #include <core/TruthTable.hpp>
-#include <core/operators/UnaryOperator.hpp>
-#include <core/operators/BinaryOperator.hpp>
+#include <core/Operators.hpp>
 #include <stdint.h>
 #include <utility>
 #include <vector>
