@@ -3,9 +3,8 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include <stdexcept>
-#include <exception>
 #include <stdint.h>
+#include <stdexcept>
 
 using namespace std;
 
@@ -123,19 +122,6 @@ public:
 private:
     vector<bool> values;
     vector<string> variables;
-};
-
-class IllegalTruthTableException : public exception {
-public:
-    IllegalTruthTableException(const char* message) : message(message) {
-    }
-
-    virtual const char* what() const throw() {
-        return message;
-    }
-
-private:
-    const char* message;
 };
 }
 
