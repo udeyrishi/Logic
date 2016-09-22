@@ -8,22 +8,22 @@
 #include <string>
 
 namespace Logic {
-    class BooleanFunction {
-    public:
-        BooleanFunction(const TruthTable &table) : table(table) {
-        }
+class BooleanFunction {
+public:
+    BooleanFunction(const TruthTable &table) : table(table) {
+    }
 
-        const TruthTable &getTruthTable() const {
-            return table;
-        }
+    const TruthTable &getTruthTable() const {
+        return table;
+    }
 
-        BooleanFunction operate(const UnaryOperator<bool> &_operator) const;
-        BooleanFunction operate(const BinaryOperator<bool> &_operator, BooleanFunction &other) const;
+    BooleanFunction operate(const UnaryOperator<bool> &_operator) const;
+    BooleanFunction operate(const BinaryOperator<bool> &_operator, BooleanFunction &other) const;
 
-    private:
-        TruthTable table;
+private:
+    TruthTable table;
 
-        TruthTable combineTables(const BinaryOperator<bool> &_operator, BooleanFunction &other) const;
-        static TruthTable combineColumnsWithSameVariables(const TruthTable &table);
-    };
+    TruthTable combineTables(const BinaryOperator<bool> &_operator, BooleanFunction &other) const;
+    static TruthTable combineColumnsWithSameVariables(const TruthTable &table);
+};
 }

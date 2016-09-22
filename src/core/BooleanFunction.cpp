@@ -115,7 +115,7 @@ TruthTable BooleanFunction::combineTables(const BinaryOperator<bool> &_operator,
         resultingTable[i] = _operator(operand1, operand2);
     }
 
-    return TruthTable({});
+    return resultingTable;
 }
 
 BooleanFunction BooleanFunction::operate(const UnaryOperator<bool> &_operator) const {

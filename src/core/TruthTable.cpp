@@ -127,79 +127,79 @@ void TruthTableBuilder::set(TruthTableUInt lineIndex, const bool b) {
 }
 
 namespace Logic {
-    TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const TruthTableVariablesUInt &rhs) {
-        return lhs + (uint64_t) rhs;
+TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const TruthTableVariablesUInt &rhs) {
+    return lhs + (uint64_t) rhs;
+}
+
+TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const int32_t &rhs) {
+    return lhs + (int64_t) rhs;
+}
+
+TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const int64_t &rhs) {
+    int64_t added = (int64_t) lhs + rhs;
+    if (added < 0) {
+        throw underflow_error("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
+    }
+    TruthTableVariablesUInt::assertFits<overflow_error>((uint64_t) added);
+    return TruthTableVariablesUInt((uint8_t) added);
+}
+
+TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const uint32_t &rhs) {
+    return lhs + (uint64_t) rhs;
+}
+
+TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const uint64_t &rhs) {
+    uint64_t added = (uint8_t) lhs + rhs;
+    TruthTableVariablesUInt::assertFits<overflow_error>(added);
+    return TruthTableVariablesUInt((uint8_t) added);
+}
+
+TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const TruthTableVariablesUInt &rhs) {
+    return lhs - (uint64_t) rhs;
+}
+
+TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const int32_t &rhs) {
+    return lhs - (int64_t) rhs;
+}
+
+TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const int64_t &rhs) {
+    int64_t subtracted = (int64_t) lhs - rhs;
+    if (subtracted < 0) {
+        throw underflow_error("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
+    }
+    TruthTableVariablesUInt::assertFits<overflow_error>((uint64_t) subtracted);
+    return TruthTableVariablesUInt((uint8_t) subtracted);
+}
+
+TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const uint32_t &rhs) {
+    return lhs - (uint64_t) rhs;
+}
+
+TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const uint64_t &rhs) {
+    if (rhs > lhs) {
+        throw underflow_error("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
     }
 
-    TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const int32_t &rhs) {
-        return lhs + (int64_t) rhs;
-    }
+    return TruthTableVariablesUInt((uint8_t) lhs - (uint8_t) rhs);
+}
 
-    TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const int64_t &rhs) {
-        int64_t added = (int64_t) lhs + rhs;
-        if (added < 0) {
-            throw underflow_error("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
-        }
-        TruthTableVariablesUInt::assertFits<overflow_error>((uint64_t) added);
-        return TruthTableVariablesUInt((uint8_t) added);
-    }
+ostream &operator<<(ostream &os, const TruthTableVariablesUInt &val) {
+    os << to_string(val);
+    return os;
+}
 
-    TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const uint32_t &rhs) {
-        return lhs + (uint64_t) rhs;
+istream &operator>>(istream &is, TruthTableVariablesUInt &val) {
+    int64_t intVal;
+    is >> intVal;
+    if (intVal < 0 || intVal > MAX_NUM_VARIABLES) {
+        throw out_of_range("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
     }
+    val = (uint8_t) intVal;
+    return is;
+}
 
-    TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const uint64_t &rhs) {
-        uint64_t added = (uint8_t) lhs + rhs;
-        TruthTableVariablesUInt::assertFits<overflow_error>(added);
-        return TruthTableVariablesUInt((uint8_t) added);
-    }
-
-    TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const TruthTableVariablesUInt &rhs) {
-        return lhs - (uint64_t) rhs;
-    }
-
-    TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const int32_t &rhs) {
-        return lhs - (int64_t) rhs;
-    }
-
-    TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const int64_t &rhs) {
-        int64_t subtracted = (int64_t) lhs - rhs;
-        if (subtracted < 0) {
-            throw underflow_error("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
-        }
-        TruthTableVariablesUInt::assertFits<overflow_error>((uint64_t) subtracted);
-        return TruthTableVariablesUInt((uint8_t) subtracted);
-    }
-
-    TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const uint32_t &rhs) {
-        return lhs - (uint64_t) rhs;
-    }
-
-    TruthTableVariablesUInt operator-(const TruthTableVariablesUInt &lhs, const uint64_t &rhs) {
-        if (rhs > lhs) {
-            throw underflow_error("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
-        }
-
-        return TruthTableVariablesUInt((uint8_t) lhs - (uint8_t) rhs);
-    }
-
-    ostream &operator<<(ostream &os, const TruthTableVariablesUInt &val) {
-        os << to_string(val);
-        return os;
-    }
-
-    istream &operator>>(istream &is, TruthTableVariablesUInt &val) {
-        int64_t intVal;
-        is >> intVal;
-        if (intVal < 0 || intVal > MAX_NUM_VARIABLES) {
-            throw out_of_range("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
-        }
-        val = (uint8_t) intVal;
-        return is;
-    }
-
-    ostream &operator<<(ostream &os, const __TruthTableValueProxy &val) {
-        os << (bool) val;
-        return os;
-    }
+ostream &operator<<(ostream &os, const __TruthTableValueProxy &val) {
+    os << (bool) val;
+    return os;
+}
 }
