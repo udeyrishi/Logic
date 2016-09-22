@@ -5,17 +5,17 @@
 using namespace Logic;
 using namespace std;
 
-TruthTableUInt getOtherTablesIndex(const TruthTableUInt combinedTablesIndex, const TruthTableVariablesUInt numVariablesInFirstTable) {
+static TruthTableUInt getOtherTablesIndex(const TruthTableUInt combinedTablesIndex, const TruthTableVariablesUInt numVariablesInFirstTable) {
     TruthTableUInt mask = ~((((TruthTableUInt) 1) << numVariablesInFirstTable) - 1);
     return (combinedTablesIndex & mask) >> numVariablesInFirstTable;
 }
 
-TruthTableUInt getFirstTablesIndex(const TruthTableUInt combinedTablesIndex, const TruthTableVariablesUInt numVariablesInFirstTable) {
+static TruthTableUInt getFirstTablesIndex(const TruthTableUInt combinedTablesIndex, const TruthTableVariablesUInt numVariablesInFirstTable) {
     TruthTableUInt mask = (((TruthTableUInt) 1) << numVariablesInFirstTable) - 1;
     return combinedTablesIndex & mask;
 }
 
-vector<pair<string, vector<TruthTableVariablesUInt>>> getVariableIndices(const vector<string> &variables) {
+static vector<pair<string, vector<TruthTableVariablesUInt>>> getVariableIndices(const vector<string> &variables) {
     vector<pair<string, vector<TruthTableVariablesUInt>>> result;
     unordered_map<string, TruthTableVariablesUInt> variablesSeen;
 
@@ -32,11 +32,11 @@ vector<pair<string, vector<TruthTableVariablesUInt>>> getVariableIndices(const v
     return result;
 }
 
-bool getVariableValueInLine(TruthTableVariablesUInt columnNumber, TruthTableUInt lineIndex) {
+static bool getVariableValueInLine(TruthTableVariablesUInt columnNumber, TruthTableUInt lineIndex) {
     return ((lineIndex >> columnNumber) & (TruthTableUInt) 1) == (TruthTableUInt) 1;
 }
 
-TruthTableUInt getLineIndexInCombinedTable(const TruthTableVariablesUInt numVariablesInOriginalTable,
+static TruthTableUInt getLineIndexInCombinedTable(const TruthTableVariablesUInt numVariablesInOriginalTable,
                                      const TruthTableUInt originalTableLineIndex,
                                      const vector<pair<string, vector<TruthTableVariablesUInt>>> &variableIndices) {
     unordered_set<TruthTableVariablesUInt> columnsToRemove;
@@ -58,7 +58,7 @@ TruthTableUInt getLineIndexInCombinedTable(const TruthTableVariablesUInt numVari
     return wordForNewLine;
 }
 
-bool shouldKeepLine(const vector<pair<string, vector<TruthTableVariablesUInt>>> &variableIndices, TruthTableUInt lineIndex) {
+static bool shouldKeepLine(const vector<pair<string, vector<TruthTableVariablesUInt>>> &variableIndices, TruthTableUInt lineIndex) {
     for (const auto &variable : variableIndices) {
         bool previous = getVariableValueInLine(variable.second[0], lineIndex);
         for (TruthTableUInt i = 1; i < variable.second.size(); ++i) {

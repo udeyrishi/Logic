@@ -1,9 +1,10 @@
 #include <core/TruthTable.hpp>
 #include <iostream>
+#include <core/Exceptions.hpp>
 
 using namespace Logic;
 
-bool isPowerOfTwo(TruthTableUInt n) {
+static bool isPowerOfTwo(TruthTableUInt n) {
     return (n > 0) && ((n & (n - 1)) == 0);
 }
 
