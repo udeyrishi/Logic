@@ -1,6 +1,16 @@
 #pragma once
 
+#include <stdexcept>
+#include <string>
+
+using namespace std;
+
 namespace Logic {
+
+#define NOT_SYMBOL string("!")
+#define AND_SYMBOL string("&")
+#define OR_SYMBOL string("|")
+#define XOR_SYMBOL string("^")
 
 template <typename T>
 class UnaryOperator {
@@ -45,4 +55,13 @@ public:
         return first != second;
     }
 };
+
+bool isKnownUnaryOperator(const string &_operator);
+bool isKnownBinaryOperator(const string &_operator);
+
+template <typename T>
+UnaryOperator<T> getUnaryOperatorWithSymbol(const string &_operator);
+
+template <typename T>
+BinaryOperator<T> getBinaryOperatorWithSymbol(const string &_operator);
 }
