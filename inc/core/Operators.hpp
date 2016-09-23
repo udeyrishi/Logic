@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -11,17 +12,25 @@ namespace Logic {
 #define AND_SYMBOL string("&")
 #define OR_SYMBOL string("|")
 #define XOR_SYMBOL string("^")
+#define OPERATOR_REGEXES vector<string>({ "["   + NOT_SYMBOL + "]", \
+                                          "["   + AND_SYMBOL + "]", \
+                                          "[\\"   + OR_SYMBOL  + "]", \
+                                          "[\\" + XOR_SYMBOL + "]"})
 
 template <typename T>
 class UnaryOperator {
 public:
-  virtual T operator()(const T in) const = 0;
+    virtual T operator()(const T in) const = 0;
+    virtual ~UnaryOperator() {
+    }
 };
 
 template <typename T>
 class BinaryOperator {
 public:
-  virtual T operator()(const T first, const T second) const = 0;
+    virtual T operator()(const T first, const T second) const = 0;
+    virtual ~BinaryOperator() {
+    }
 };
 
 template <typename T>
@@ -59,9 +68,25 @@ public:
 bool isKnownUnaryOperator(const string &_operator);
 bool isKnownBinaryOperator(const string &_operator);
 
+// Need to leave this implementation in the header, because else the linker freaks out
 template <typename T>
-UnaryOperator<T> getUnaryOperatorWithSymbol(const string &_operator);
+UnaryOperator<T> *createUnaryOperatorWithSymbol(const string &_operator) {
+    if (_operator == NOT_SYMBOL) {
+        return new Not<T>();
+    }
+    throw invalid_argument("Unknown operator: " + _operator);
+}
 
+// Need to leave this implementation in the header, because else the linker freaks out
 template <typename T>
-BinaryOperator<T> getBinaryOperatorWithSymbol(const string &_operator);
+BinaryOperator<T> *createBinaryOperatorWithSymbol(const string &_operator) {
+    if (_operator == AND_SYMBOL) {
+        return new And<T>();
+    } else if (_operator == OR_SYMBOL) {
+        return new Or<T>();
+    } else if (_operator == XOR_SYMBOL) {
+        return new Xor<T>();
+    }
+    throw invalid_argument("Unknown operator: " + _operator);
+}
 }
