@@ -5,22 +5,41 @@
 using namespace std;
 
 namespace Logic {
-class IllegalStateException : public exception {
+
+class LogicException : public exception {
 public:
-    IllegalStateException(const char* message) : message(message) {
+    LogicException(const string &message) : message(message) {
     }
 
     virtual const char* what() const throw() {
-        return message;
+        return message.c_str();
     }
 
 private:
-    const char* message;
+    const string message;
+};
+
+class IllegalStateException : public LogicException {
+public:
+    IllegalStateException(const string &message) : LogicException(message) {
+    }
 };
 
 class IllegalTruthTableException : public IllegalStateException {
 public:
-    IllegalTruthTableException(const char* message) : IllegalStateException(message) {
+    IllegalTruthTableException(const string &message) : IllegalStateException(message) {
+    }
+};
+
+class BadBooleanFunctionException : public LogicException {
+public:
+    BadBooleanFunctionException(const string &message) : LogicException(message) {
+    }
+};
+
+class UnknownTokenException : public BadBooleanFunctionException {
+public:
+    UnknownTokenException(const string &message) : BadBooleanFunctionException(message) {
     }
 };
 }

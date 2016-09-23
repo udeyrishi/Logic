@@ -13,6 +13,10 @@ public:
     BooleanFunction(const TruthTable &table) : table(table) {
     }
 
+    TruthTable &getTruthTable() {
+        return table;
+    }
+
     const TruthTable &getTruthTable() const {
         return table;
     }
