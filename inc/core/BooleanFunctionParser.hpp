@@ -4,7 +4,6 @@
 #include <core/Operators.hpp>
 #include <core/BooleanFunction.hpp>
 #include <stack>
-#include <regex>
 
 using namespace std;
 
@@ -21,9 +20,7 @@ private:
     stack<BooleanFunction> _stack;
 };
 
-bool isValidVariable(const string &var) {
-    return regex_match(var, regex(VARIABLE_REGEX));
-}
+bool isValidVariable(const string &var);
 
 class BooleanFunctionParser {
 public:

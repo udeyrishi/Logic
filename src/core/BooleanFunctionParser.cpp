@@ -22,6 +22,14 @@ static string join(const vector<string> &vec, const string &delimiter) {
     return joined;
 }
 
+template <typename T>
+static T topAndPop(stack<T> &_stack) {
+    T top = _stack.top();
+    _stack.pop();
+    return top;
+}
+
+namespace Logic {
 static string getInfixTokensRegex() {
     static string result;
     unique_lock<mutex> lock(infixTokenRegexMutex);
@@ -37,11 +45,8 @@ static string getInfixTokensRegex() {
     return result;
 }
 
-template <typename T>
-static T topAndPop(stack<T> &_stack) {
-    T top = _stack.top();
-    _stack.pop();
-    return top;
+bool isValidVariable(const string &var) {
+    return regex_match(var, regex(VARIABLE_REGEX));
 }
 
 void BooleanFunctionAccumulator::push(const string &variable) {
@@ -161,4 +166,5 @@ BooleanFunction BooleanFunctionParser::parse(const string &function) const {
     } catch (const IllegalStateException &e) {
         throw new BadBooleanFunctionException("Missing operator tokens in the boolean function.");
     }
+}
 }
