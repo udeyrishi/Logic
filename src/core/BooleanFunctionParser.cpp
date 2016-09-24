@@ -110,6 +110,7 @@ static vector<string> getPostfixTokens(const string &function) {
     operatorStackItems.push_back("[\\(]");
     const regex stackItemsRegex(join(operatorStackItems, "|"));
     smatch sm;
+
     for (const string &token : infixTokens) {
         if (token == ")") {
             while (true) {
@@ -119,6 +120,11 @@ static vector<string> getPostfixTokens(const string &function) {
 
                 string top = topAndPop(operatorStack);
                 if (top == "(") {
+                    // unary operators have the opposite precedence. They need to applied to first
+                    while (!operatorStack.empty() && isKnownUnaryOperator(operatorStack.top())) {
+                        string unaryOperator = topAndPop(operatorStack);
+                        postfixTokens.push_back(unaryOperator);
+                    }
                     break;
                 }
                 postfixTokens.push_back(top);
