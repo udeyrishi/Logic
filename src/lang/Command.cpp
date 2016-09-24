@@ -6,7 +6,7 @@
 
 using namespace std;
 
-static const regex CREATE_ARGS_REGEX("\\s*([a-zA-Z]+)\\s*[=]\\s*(.)\\s*");
+static const regex CREATE_ARGS_REGEX("\\s*([a-zA-Z]+)\\s*[=]\\s*(.+)\\s*");
 
 namespace Logic {
 void CreateBooleanFunctionCommand::execute(const string &args, Runtime &runtime, ostream &out) {
