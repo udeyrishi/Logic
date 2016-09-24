@@ -15,7 +15,21 @@ void CreateBooleanFunctionCommand::execute(const string &args, Runtime &runtime,
     if (regex_search(args, sm, CREATE_ARGS_REGEX, regex_constants::match_continuous)) {
         string variableName = sm[1];
         BooleanFunctionParser functionParser;
-        runtime.save(variableName, functionParser.parse(sm[2]));
+        BooleanFunction function = functionParser.parse(sm[2]);
+        runtime.save(variableName, function);
+
+        // temp
+        out << "var: " << variableName << endl;
+        out << "table's vars: ";
+        for (const auto x : function.getTruthTable().getVariables()) {
+            out << x << ", ";
+        }
+        out << endl;
+
+        for (unsigned long i = 0; i < function.getTruthTable().size(); ++i) {
+            out << function.getTruthTable()[i] << ", ";
+        }
+        out << endl;
     } else {
         throw BadCommandArgumentsException("Unknown args to command 'let': " + args);
     }
