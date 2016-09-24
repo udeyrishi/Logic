@@ -42,4 +42,16 @@ public:
     UnknownTokenException(const string &message) : BadBooleanFunctionException(message) {
     }
 };
+
+class UnknownCommandException : public LogicException {
+public:
+    UnknownCommandException(const string &message) : LogicException(message) {
+    }
+};
+
+class BadCommandArgumentsException : public LogicException {
+public:
+    BadCommandArgumentsException(const string &message) : LogicException(message) {
+    }
+};
 }

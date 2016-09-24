@@ -1,6 +1,6 @@
 #include <core/TruthTable.hpp>
 #include <iostream>
-#include <core/Exceptions.hpp>
+#include <Exceptions.hpp>
 
 using namespace Logic;
 

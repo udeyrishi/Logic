@@ -1,8 +1,9 @@
 #include <core/BooleanFunctionParser.hpp>
-#include <core/Exceptions.hpp>
+#include <Exceptions.hpp>
 #include <vector>
 #include <stdint.h>
 #include <mutex>
+#include <regex>
 
 using namespace Logic;
 using namespace std;
