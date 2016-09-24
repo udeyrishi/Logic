@@ -80,7 +80,7 @@ bool TruthTableVariablesUInt::operator==(const uint64_t &rhs) const {
     return (uint64_t) value == rhs;
 }
 
-TruthTable::TruthTable(const vector<string> &variables) : variables(variables), values(variables.size(), false) {
+TruthTable::TruthTable(const vector<string> &variables) : variables(variables), values(pow(2, variables.size()), false) {
     if (variables.size() == 0 || variables.size() > MAX_NUM_VARIABLES) {
         throw invalid_argument("variables' size needs to be 0 < n <= " + to_string(MAX_NUM_VARIABLES));
     }
