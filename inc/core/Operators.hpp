@@ -8,14 +8,14 @@ using namespace std;
 
 namespace Logic {
 
-#define NOT_SYMBOL string("!")
-#define AND_SYMBOL string("&")
-#define OR_SYMBOL string("|")
-#define XOR_SYMBOL string("^")
-#define OPERATOR_REGEXES vector<string>({ "["   + NOT_SYMBOL + "]", \
-                                          "["   + AND_SYMBOL + "]", \
-                                          "[\\"   + OR_SYMBOL  + "]", \
-                                          "[\\" + XOR_SYMBOL + "]"})
+static const string NOT_SYMBOL("!");
+static const string AND_SYMBOL("&");
+static const string OR_SYMBOL("|");
+static const string XOR_SYMBOL("^");
+static const vector<string> OPERATOR_REGEXES({ "["   + NOT_SYMBOL + "]",
+                                          "["   + AND_SYMBOL + "]",
+                                          "[\\"   + OR_SYMBOL  + "]",
+                                          "[\\" + XOR_SYMBOL + "]"});
 
 template <typename T>
 class UnaryOperator {

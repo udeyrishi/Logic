@@ -9,7 +9,7 @@
 using namespace std;
 
 namespace Logic {
-#define VARIABLE_REGEX "[a-zA-Z]+"
+static const string VARIABLE_REGEX("[a-zA-Z]+");
 
 class BooleanFunctionAccumulator {
 public:
