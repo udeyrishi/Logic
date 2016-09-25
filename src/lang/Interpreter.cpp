@@ -1,6 +1,7 @@
 #include <lang/Interpreter.hpp>
 #include <string>
 #include <lang/Command.hpp>
+#include <Utils.hpp>
 
 using namespace std;
 using namespace Logic;
@@ -32,8 +33,8 @@ void Interpreter::run() {
         while (i < line.length() && isWhitespace(lineChars[i])) {
             ++i;
         }
-        // Can be empty
-        string args = line.substr(i, string::npos);
+        // args can be empty
+        string args = trim(line.substr(i, string::npos));
         Command *command = getCommand(commandString);
         command->execute(args, runtime, out);
         delete command;
