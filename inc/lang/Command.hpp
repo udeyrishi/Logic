@@ -20,5 +20,11 @@ public:
     virtual void execute(const string &args, Runtime &runtime, ostream &out);
 };
 
+static const string PRINT_BOOLEAN_FUNCTION_COMMAND("print");
+class PrintBooleanFunctionCommand : public Command {
+public:
+    virtual void execute(const string &functionName, Runtime &runtime, ostream &out);
+};
+
 Command *getCommand(const string &command);
 }

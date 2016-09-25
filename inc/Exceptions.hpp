@@ -54,4 +54,10 @@ public:
     BadCommandArgumentsException(const string &message) : LogicException(message) {
     }
 };
+
+class BooleanFunctionNotFoundException : public LogicException {
+public:
+    BooleanFunctionNotFoundException(const string &message) : LogicException(message) {
+    }
+};
 }

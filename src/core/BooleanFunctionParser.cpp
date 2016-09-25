@@ -94,7 +94,7 @@ static vector<string> getInfixTokens(const string &function) {
     }
     if (i != function.length()) {
         // prematurely failed lookup because of match_continuous flag. Unknown token at index i
-        throw UnknownTokenException("Unknown token in the string at index " + to_string(i));
+        throw UnknownTokenException("Unknown token in the string at index " + to_string(i) + "in the boolean function");
     }
     return tokens;
 }

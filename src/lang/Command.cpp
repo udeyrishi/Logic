@@ -12,32 +12,28 @@ namespace Logic {
 void CreateBooleanFunctionCommand::execute(const string &args, Runtime &runtime, ostream &out) {
     UNUSED(out);
     smatch sm;
-    if (regex_search(args, sm, CREATE_ARGS_REGEX, regex_constants::match_continuous)) {
+    if (regex_match(args, sm, CREATE_ARGS_REGEX, regex_constants::match_continuous)) {
         string variableName = sm[1];
         BooleanFunctionParser functionParser;
-        BooleanFunction function = functionParser.parse(sm[2]);
-        runtime.save(variableName, function);
-
-        // temp
-        out << "var: " << variableName << endl;
-        out << "table's vars: ";
-        for (const auto x : function.getTruthTable().getVariables()) {
-            out << x << ", ";
-        }
-        out << endl;
-
-        for (unsigned long i = 0; i < function.getTruthTable().size(); ++i) {
-            out << function.getTruthTable()[i] << ", ";
-        }
-        out << endl;
+        runtime.save(variableName, functionParser.parse(sm[2]));
     } else {
         throw BadCommandArgumentsException("Unknown args to command 'let': " + args);
+    }
+}
+
+void PrintBooleanFunctionCommand::execute(const string &functionName, Runtime &runtime, ostream &out) {
+    if (runtime.contains(functionName)) {
+        out << runtime.get(functionName);
+    } else {
+        out << "Not found: " + functionName;
     }
 }
 
 Command *getCommand(const string &command) {
     if (command == CREATE_BOOLEAN_FUNCTION_COMMAND) {
         return new CreateBooleanFunctionCommand();
+    } else if (command == PRINT_BOOLEAN_FUNCTION_COMMAND) {
+        return new PrintBooleanFunctionCommand();
     }
 
     throw UnknownCommandException("Unknown command: " + command);
