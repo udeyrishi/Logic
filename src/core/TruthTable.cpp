@@ -1,12 +1,12 @@
 /**
  Copyright 2016 Udey Rishi
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
     http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -244,10 +244,12 @@ ostream &operator<<(ostream &os, const TruthTable &table) {
                                table.getVariables().size() + 1 + // all verticle bars
                                2; // result column
 
-    // Print the title
+    TruthTableVariablesUInt numVariables = table.getVariables().size();
+
+    // Print the title. Reverse the order so that the LSB is on the right (usual convention)
     {
-        for (TruthTableVariablesUInt i = 0; i < table.getVariables().size(); ++i) {
-            const string &var = table.getVariables()[i];
+        for (TruthTableVariablesUInt i = 0; i < numVariables; ++i) {
+            const string &var = table.getVariables()[numVariables - i - 1];
             os << '|'
                << string(getLeftPadding(cellWidth, var.length()), ' ')
                << var
@@ -260,10 +262,10 @@ ostream &operator<<(ostream &os, const TruthTable &table) {
     // Print the lines
     {
         for (TruthTableUInt i = 0; i < table.size(); ++i) {
-            for (TruthTableVariablesUInt j = 0; j < table.getVariables().size(); ++j) {
+            for (TruthTableVariablesUInt j = 0; j < numVariables; ++j) {
                 os << '|'
                    << string(getLeftPadding(cellWidth, 1), ' ')
-                   << (TruthTable::getVariableValueInLine(j, i) ? '1' : '0')
+                   << (TruthTable::getVariableValueInLine(numVariables - j - 1, i) ? '1' : '0')
                    << (string(getRightPadding(cellWidth, 1), ' '));
             }
             os << "| " << table[i] << endl;
