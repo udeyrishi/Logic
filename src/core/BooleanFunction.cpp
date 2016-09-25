@@ -2,9 +2,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
-using namespace Logic;
 using namespace std;
 
+namespace Logic {
 static TruthTableUInt getOtherTablesIndex(const TruthTableUInt combinedTablesIndex, const TruthTableVariablesUInt numVariablesInFirstTable) {
     TruthTableUInt mask = ~((((TruthTableUInt) 1) << numVariablesInFirstTable) - 1);
     return (combinedTablesIndex & mask) >> numVariablesInFirstTable;
@@ -32,10 +32,6 @@ static vector<pair<string, vector<TruthTableVariablesUInt>>> getVariableIndices(
     return result;
 }
 
-static bool getVariableValueInLine(TruthTableVariablesUInt columnNumber, TruthTableUInt lineIndex) {
-    return ((lineIndex >> columnNumber) & (TruthTableUInt) 1) == (TruthTableUInt) 1;
-}
-
 static TruthTableUInt getLineIndexInCombinedTable(const TruthTableVariablesUInt numVariablesInOriginalTable,
                                      const TruthTableUInt originalTableLineIndex,
                                      const vector<pair<string, vector<TruthTableVariablesUInt>>> &variableIndices) {
@@ -51,7 +47,7 @@ static TruthTableUInt getLineIndexInCombinedTable(const TruthTableVariablesUInt 
     TruthTableVariablesUInt newLineColumn = 0;
     for (TruthTableVariablesUInt column = 0; column < numVariablesInOriginalTable; ++column) {
         if (columnsToRemove.find(column) == columnsToRemove.end()) {
-            wordForNewLine += (getVariableValueInLine(column, originalTableLineIndex) ? (TruthTableUInt)1 : (TruthTableUInt)0) << newLineColumn++;
+            wordForNewLine += (TruthTable::getVariableValueInLine(column, originalTableLineIndex) ? (TruthTableUInt)1 : (TruthTableUInt)0) << newLineColumn++;
         }
     }
 
@@ -60,9 +56,9 @@ static TruthTableUInt getLineIndexInCombinedTable(const TruthTableVariablesUInt 
 
 static bool shouldKeepLine(const vector<pair<string, vector<TruthTableVariablesUInt>>> &variableIndices, TruthTableUInt lineIndex) {
     for (const auto &variable : variableIndices) {
-        bool previous = getVariableValueInLine(variable.second[0], lineIndex);
+        bool previous = TruthTable::getVariableValueInLine(variable.second[0], lineIndex);
         for (TruthTableUInt i = 1; i < variable.second.size(); ++i) {
-            if (previous != getVariableValueInLine(variable.second[i], lineIndex)) {
+            if (previous != TruthTable::getVariableValueInLine(variable.second[i], lineIndex)) {
                 return false;
             }
         }

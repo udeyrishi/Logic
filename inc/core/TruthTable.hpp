@@ -44,7 +44,6 @@ public:
 
     template <typename TException>
     static void assertFits(const uint64_t value);
-
 private:
     uint8_t value;
 };
@@ -76,17 +75,19 @@ public:
     }
 
     __TruthTableValueProxy operator[](const TruthTableUInt index);
-
     bool operator[](const TruthTableUInt index) const;
 
+    static bool getVariableValueInLine(TruthTableVariablesUInt columnNumber, TruthTableUInt lineIndex);
 private:
-    const vector<string> variables;
+    vector<string> variables;
     vector<bool> values;
 
     void validateIndex(const TruthTableUInt index) const;
 
     friend class __TruthTableValueProxy;
 };
+
+ostream &operator<<(ostream &os, const TruthTable &table);
 
 // This type should not be used directly by keeping a variable. It should be either converted to a bool, or used for assignment.
 class __TruthTableValueProxy {

@@ -1,9 +1,9 @@
 #include <core/TruthTable.hpp>
 #include <iostream>
 #include <Exceptions.hpp>
+#include <algorithm>
 
-using namespace Logic;
-
+namespace Logic {
 static bool isPowerOfTwo(TruthTableUInt n) {
     return (n > 0) && ((n & (n - 1)) == 0);
 }
@@ -127,7 +127,6 @@ void TruthTableBuilder::set(TruthTableUInt lineIndex, const bool b) {
     values[lineIndex] = b;
 }
 
-namespace Logic {
 TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const TruthTableVariablesUInt &rhs) {
     return lhs + (uint64_t) rhs;
 }
@@ -201,6 +200,60 @@ istream &operator>>(istream &is, TruthTableVariablesUInt &val) {
 
 ostream &operator<<(ostream &os, const __TruthTableValueProxy &val) {
     os << (bool) val;
+    return os;
+}
+
+static uint64_t getLeftPadding(uint64_t cellWidth, uint64_t itemWidth) {
+    uint64_t totalPadding = cellWidth - itemWidth;
+    return totalPadding / 2;
+}
+
+static uint64_t getRightPadding(uint64_t cellWidth, uint64_t itemWidth) {
+    uint64_t totalPadding = cellWidth - itemWidth;
+    return totalPadding - getLeftPadding(cellWidth, itemWidth);
+}
+
+bool TruthTable::getVariableValueInLine(TruthTableVariablesUInt columnNumber, TruthTableUInt lineIndex) {
+    return ((lineIndex >> columnNumber) & (TruthTableUInt) 1) == (TruthTableUInt) 1;
+}
+
+ostream &operator<<(ostream &os, const TruthTable &table) {
+    uint64_t cellWidth = max_element(table.getVariables().begin(),
+                                     table.getVariables().end(),
+                                     [](const string &a, const string &b) {
+                                        return a.length() < b.length();
+                                     })->length() + 2;
+
+    uint64_t totalTableWidth = cellWidth * table.getVariables().size() + // all titles
+                               table.getVariables().size() + 1 + // all verticle bars
+                               2; // result column
+
+    // Print the title
+    {
+        for (TruthTableVariablesUInt i = 0; i < table.getVariables().size(); ++i) {
+            const string &var = table.getVariables()[i];
+            os << '|'
+               << string(getLeftPadding(cellWidth, var.length()), ' ')
+               << var
+               << string(getRightPadding(cellWidth, var.length()), ' ');
+        }
+        os << '|' << endl;
+        os << string(totalTableWidth, '-') << endl;
+    }
+
+    // Print the lines
+    {
+        for (TruthTableUInt i = 0; i < table.size(); ++i) {
+            for (TruthTableVariablesUInt j = 0; j < table.getVariables().size(); ++j) {
+                os << '|'
+                   << string(getLeftPadding(cellWidth, 1), ' ')
+                   << (TruthTable::getVariableValueInLine(j, i) ? '1' : '0')
+                   << (string(getRightPadding(cellWidth, 1), ' '));
+            }
+            os << "| " << table[i] << endl;
+        }
+    }
+
     return os;
 }
 }
