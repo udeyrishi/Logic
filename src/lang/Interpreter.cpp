@@ -1,12 +1,12 @@
 /**
  Copyright 2016 Udey Rishi
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
     http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,6 +23,7 @@ using namespace std;
 using namespace Logic;
 
 static const char DELIMITER = ';';
+static const string PROMPTS = ">> ";
 
 static bool isWhitespace(char c) {
     return c == ' ' || c == '\t' || c == '\n';
@@ -30,6 +31,10 @@ static bool isWhitespace(char c) {
 
 void Interpreter::run() {
     string line;
+    if (printPrompts) {
+        cout << PROMPTS;
+    }
+
     while (getline(in, line, DELIMITER)) {
         const char *lineChars = line.c_str();
         uint64_t i;
@@ -54,5 +59,8 @@ void Interpreter::run() {
         Command *command = getCommand(commandString);
         command->execute(args, runtime, out);
         delete command;
+        if (printPrompts) {
+            cout << PROMPTS;
+        }
     }
 }
