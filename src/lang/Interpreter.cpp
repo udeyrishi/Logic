@@ -18,6 +18,7 @@
 #include <string>
 #include <lang/Command.hpp>
 #include <Utils.hpp>
+#include <Exceptions.hpp>
 
 using namespace std;
 using namespace Logic;
@@ -50,15 +51,19 @@ void Interpreter::run() {
                 start = i;
             }
         }
-        string commandString = line.substr(start, i - start);
-        while (i < line.length() && isWhitespace(lineChars[i])) {
-            ++i;
+        string commandString = trim(line.substr(start, i - start));
+        // If empty line, ignore it.
+        if (commandString.length() != 0) {
+            while (i < line.length() && isWhitespace(lineChars[i])) {
+                ++i;
+            }
+            // args can be empty
+            string args = trim(line.substr(i, string::npos));
+            Command *command = getCommand(commandString);
+            command->execute(args, runtime, out);
+            delete command;
         }
-        // args can be empty
-        string args = trim(line.substr(i, string::npos));
-        Command *command = getCommand(commandString);
-        command->execute(args, runtime, out);
-        delete command;
+
         if (printPrompts) {
             cout << PROMPTS;
         }
