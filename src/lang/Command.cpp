@@ -50,10 +50,12 @@ bool DeleteBooleanFunctionCommand::execute(const string &functionName, Runtime &
     return true;
 }
 
-bool QuitCommand::execute(const string &functionName, Runtime &runtime, ostream &out) {
+bool QuitCommand::execute(const string &args, Runtime &runtime, ostream &out) {
     UNUSED(out);
-    UNUSED(functionName);
     UNUSED(runtime);
+    if (args.length() != 0) {
+        throw BadCommandArgumentsException("Unknown args to command 'quit': " + args);
+    }
     return false;
 }
 

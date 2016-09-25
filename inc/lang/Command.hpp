@@ -49,7 +49,7 @@ class DeleteBooleanFunctionCommand : public Command {
 
 static const vector<string> QUIT_COMMAND({"quit", "q"});
 class QuitCommand : public Command {
-    virtual bool execute(const string &functionName, Runtime &runtime, ostream &out);
+    virtual bool execute(const string &args, Runtime &runtime, ostream &out);
 };
 
 Command *getCommand(const string &command);
