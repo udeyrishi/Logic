@@ -32,7 +32,9 @@ bool CreateBooleanFunctionCommand::execute(const string &args, Runtime &runtime,
     if (regex_match(args, sm, CREATE_ARGS_REGEX, regex_constants::match_continuous)) {
         string variableName = sm[1];
         BooleanFunctionParser functionParser;
-        runtime.save(variableName, functionParser.parse(sm[2]));
+        runtime.save(variableName, functionParser.parse(sm[2], [&](const string &functionName) -> const BooleanFunction& {
+            return runtime.get(functionName);
+        }));
         return true;
     } else {
         throw BadCommandArgumentsException("Unknown args to command 'let': " + args);

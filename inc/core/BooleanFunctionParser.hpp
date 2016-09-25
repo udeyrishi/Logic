@@ -1,12 +1,12 @@
 /**
  Copyright 2016 Udey Rishi
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
     http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,23 +20,20 @@
 #include <core/Operators.hpp>
 #include <core/BooleanFunction.hpp>
 #include <stack>
+#include <functional>
 
 using namespace std;
 
 namespace Logic {
-static const string VARIABLE_REGEX("[a-zA-Z]+");
-
 class BooleanFunctionAccumulator {
 public:
-    void push(const string &variable);
+    void push(const BooleanFunction &function);
     void push(const UnaryOperator<bool> &_operator);
     void push(const BinaryOperator<bool> &_operator);
     BooleanFunction pop();
 private:
     stack<BooleanFunction> _stack;
 };
-
-bool isValidVariable(const string &var);
 
 class BooleanFunctionParser {
 public:
@@ -50,5 +47,8 @@ public:
      * The convention for this parser is to use the latter lazy one.
      */
     BooleanFunction parse(const string &function) const;
+
+    // The lookup function will be used for resolving variables stating with '$'
+    BooleanFunction parse(const string &function, std::function<const BooleanFunction& (const string&)> lookupFunction) const;
 };
 }

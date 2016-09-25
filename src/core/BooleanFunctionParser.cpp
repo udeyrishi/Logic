@@ -15,11 +15,12 @@
 */
 
 #include <core/BooleanFunctionParser.hpp>
-#include <Exceptions.hpp>
 #include <vector>
 #include <stdint.h>
 #include <mutex>
 #include <regex>
+#include <Exceptions.hpp>
+#include <Utils.hpp>
 
 using namespace Logic;
 using namespace std;
@@ -53,7 +54,7 @@ static string getInfixTokensRegex() {
         vector<string> tokens = OPERATOR_REGEXES;
         tokens.push_back("[\\(]");
         tokens.push_back("[\\)]");
-        tokens.push_back("[a-zA-Z]+");
+        tokens.push_back("[\\$a-zA-Z]+");
         result = "[\\s]*(" + // Optional leading spaces
                  join(tokens, "|") + // actual token regex
                  ")[\\s]*"; // optional trailing spaces
@@ -61,14 +62,7 @@ static string getInfixTokensRegex() {
     return result;
 }
 
-bool isValidVariable(const string &var) {
-    return regex_match(var, regex(VARIABLE_REGEX));
-}
-
-void BooleanFunctionAccumulator::push(const string &variable) {
-    BooleanFunction function(TruthTable({ variable }));
-    function.getTruthTable()[0] = false;
-    function.getTruthTable()[1] = true;
+void BooleanFunctionAccumulator::push(const BooleanFunction &function) {
     _stack.push(function);
 }
 
@@ -166,6 +160,12 @@ static vector<string> getPostfixTokens(const string &function) {
 }
 
 BooleanFunction BooleanFunctionParser::parse(const string &function) const {
+    return parse(function, [](const string &functionName) -> const BooleanFunction& {
+        throw BooleanFunctionNotFoundException("Boolean function not found: " + functionName);
+    });
+}
+
+BooleanFunction BooleanFunctionParser::parse(const string &function, std::function<const BooleanFunction& (const string&)> lookupFunction) const {
     vector<string> postfixTokens = getPostfixTokens(function);
     BooleanFunctionAccumulator accumulator;
     for (const string &token : postfixTokens) {
@@ -179,7 +179,20 @@ BooleanFunction BooleanFunctionParser::parse(const string &function) const {
             delete op;
         } else {
             // token == variable
-            accumulator.push(token);
+            if (token.c_str()[0] == '$') {
+                string lookupFunctionName = token.substr(1, string::npos);
+                if (lookupFunctionName.length() == 0) {
+                    // someone used $ as a variable name
+                    throw UnknownTokenException("'$' is reserved token, and cannot be used as a variable name.");
+                }
+                const BooleanFunction &function = lookupFunction(lookupFunctionName);
+                accumulator.push(function);
+            } else {
+                BooleanFunction function(TruthTable({ token }));
+                function.getTruthTable()[0] = false;
+                function.getTruthTable()[1] = true;
+                accumulator.push(function);
+            }
         }
     }
 
