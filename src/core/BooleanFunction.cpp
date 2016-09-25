@@ -125,3 +125,9 @@ BooleanFunction BooleanFunction::operate(const UnaryOperator<bool> &_operator) c
 BooleanFunction BooleanFunction::operate(const BinaryOperator<bool> &_operator, BooleanFunction &other) const {
     return BooleanFunction(combineColumnsWithSameVariables(combineTables(_operator, other)));
 }
+
+ostream &operator<<(ostream &os, const BooleanFunction &function) {
+    os << function.getTruthTable();
+    return os;
+}
+}

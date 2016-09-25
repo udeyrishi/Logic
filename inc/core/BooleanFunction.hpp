@@ -30,4 +30,6 @@ private:
     TruthTable combineTables(const BinaryOperator<bool> &_operator, BooleanFunction &other) const;
     static TruthTable combineColumnsWithSameVariables(const TruthTable &table);
 };
+
+ostream &operator<<(ostream &os, const BooleanFunction &function);
 }
