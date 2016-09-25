@@ -38,7 +38,6 @@ int main(int argc, char **argv) {
                 cerr << "ERROR: " << ex.what() << endl;
             }
         }
-
     } else if (argc == 2) {
         char* path = argv[1];
         ifstream infile(path);

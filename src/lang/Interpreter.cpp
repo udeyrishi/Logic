@@ -60,8 +60,11 @@ void Interpreter::run() {
             // args can be empty
             string args = trim(line.substr(i, string::npos));
             Command *command = getCommand(commandString);
-            command->execute(args, runtime, out);
+            bool _continue = command->execute(args, runtime, out);
             delete command;
+            if (!_continue) {
+                break;
+            }
         }
 
         if (printPrompts) {

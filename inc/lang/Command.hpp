@@ -25,21 +25,31 @@ using namespace std;
 namespace Logic {
 class Command {
 public:
-    virtual void execute(const string &args, Runtime &runtime, ostream &out) = 0;
+    virtual bool execute(const string &args, Runtime &runtime, ostream &out) = 0;
     virtual ~Command() {
     }
 };
 
-static const string CREATE_BOOLEAN_FUNCTION_COMMAND("let");
+static const vector<string> CREATE_COMMAND({"let", "l"});
 class CreateBooleanFunctionCommand : public Command  {
 public:
-    virtual void execute(const string &args, Runtime &runtime, ostream &out);
+    virtual bool execute(const string &args, Runtime &runtime, ostream &out);
 };
 
-static const string PRINT_BOOLEAN_FUNCTION_COMMAND("print");
+static const vector<string> PRINT_COMMAND({"print", "p"});
 class PrintBooleanFunctionCommand : public Command {
 public:
-    virtual void execute(const string &functionName, Runtime &runtime, ostream &out);
+    virtual bool execute(const string &functionName, Runtime &runtime, ostream &out);
+};
+
+static const vector<string> DELETE_COMMAND({"delete", "d"});
+class DeleteBooleanFunctionCommand : public Command {
+    virtual bool execute(const string &functionName, Runtime &runtime, ostream &out);
+};
+
+static const vector<string> QUIT_COMMAND({"quit", "q"});
+class QuitCommand : public Command {
+    virtual bool execute(const string &functionName, Runtime &runtime, ostream &out);
 };
 
 Command *getCommand(const string &command);
