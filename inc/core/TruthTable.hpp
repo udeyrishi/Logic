@@ -1,12 +1,12 @@
 /**
  Copyright 2016 Udey Rishi
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
     http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,6 +21,7 @@
 #include <cmath>
 #include <stdint.h>
 #include <stdexcept>
+#include <unordered_map>
 
 using namespace std;
 
@@ -28,6 +29,7 @@ namespace Logic {
 #define MAX_NUM_VARIABLES 64
 
 class __TruthTableValueProxy;
+class TruthTableCondition;
 
 typedef uint64_t TruthTableUInt;
 
@@ -93,6 +95,8 @@ public:
     __TruthTableValueProxy operator[](const TruthTableUInt index);
     bool operator[](const TruthTableUInt index) const;
 
+    TruthTableCondition when(const string &variable, const bool value);
+
     static bool getVariableValueInLine(TruthTableVariablesUInt columnNumber, TruthTableUInt lineIndex);
 private:
     vector<string> variables;
@@ -148,5 +152,22 @@ struct hash<Logic::TruthTableVariablesUInt> {
     size_t operator()(const Logic::TruthTableVariablesUInt &val) const {
         return (uint8_t)val;
     }
+};
+}
+
+namespace Logic {
+
+class TruthTableCondition {
+public:
+    TruthTableCondition &when(const string &variable, const bool value);
+    TruthTable then();
+private:
+    TruthTableCondition(const TruthTable &table) : table(table) {
+    }
+
+    friend class TruthTable;
+
+    const TruthTable &table;
+    unordered_map<TruthTableVariablesUInt, bool> conditions;
 };
 }

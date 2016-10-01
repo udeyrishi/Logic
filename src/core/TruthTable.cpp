@@ -18,6 +18,7 @@
 #include <iostream>
 #include <Exceptions.hpp>
 #include <algorithm>
+#include <unordered_set>
 
 namespace Logic {
 static bool isPowerOfTwo(TruthTableUInt n) {
@@ -96,9 +97,26 @@ bool TruthTableVariablesUInt::operator==(const uint64_t &rhs) const {
     return (uint64_t) value == rhs;
 }
 
+template <typename TContainer, typename TValue>
+static bool containsDuplicates(const TContainer &container) {
+    unordered_set<TValue> valuesSeen;
+    for (const TValue &val : container) {
+        if (valuesSeen.find(val) == valuesSeen.end()) {
+            valuesSeen.insert(val);
+        } else {
+            return true;
+        }
+    }
+    return false;
+}
+
 TruthTable::TruthTable(const vector<string> &variables) : variables(variables), values(pow(2, variables.size()), false) {
     if (variables.size() == 0 || variables.size() > MAX_NUM_VARIABLES) {
         throw invalid_argument("variables' size needs to be 0 < n <= " + to_string(MAX_NUM_VARIABLES));
+    }
+
+    if (containsDuplicates<vector<string>, string>(variables)) {
+        throw invalid_argument("TruthTable cannot contain duplicate variables");
     }
 }
 
@@ -116,6 +134,52 @@ void TruthTable::validateIndex(const TruthTableUInt index) const {
     if (index >= size()) {
         throw out_of_range("index needs to be in range: [0, " + to_string(size() - 1) + "]");
     }
+}
+
+TruthTableCondition TruthTable::when(const string &variable, const bool value) {
+    return TruthTableCondition(*this).when(variable, value);
+}
+
+TruthTableCondition &TruthTableCondition::when(const string &variable, const bool value) {
+    const auto &hit = find(table.getVariables().begin(), table.getVariables().end(), variable);
+    if (hit == table.getVariables().end()) {
+        throw invalid_argument("variable not found in the truth table: " + variable);
+    }
+
+    TruthTableVariablesUInt position = hit - table.getVariables().begin();
+    if (conditions.find(position) != conditions.end()) {
+        conditions.erase(position);
+    }
+
+    conditions.insert(make_pair(position, value));
+    return *this;
+}
+
+TruthTable TruthTableCondition::then() {
+    TruthTableUInt newTable = 0;
+    TruthTableBuilder builder;
+    for (TruthTableUInt i = 0; i < table.size(); ++i) {
+        bool allConditionsMet = true;
+        for (const auto &condition : conditions) {
+            if ((bool) ((i >> condition.first) & 1) != condition.second) {
+                allConditionsMet = false;
+                break;
+            }
+        }
+
+        if (allConditionsMet) {
+            builder.set(newTable++, table[i]);
+        }
+    }
+
+    vector<string> newVariables;
+    for (TruthTableVariablesUInt i = 0; i < table.getVariables().size(); ++i) {
+        if (conditions.find(i) == conditions.end()) {
+            newVariables.push_back(table.getVariables()[i]);
+        }
+    }
+    builder.setVariables(newVariables);
+    return builder.build();
 }
 
 TruthTable TruthTableBuilder::build() const {
