@@ -24,6 +24,8 @@ using namespace std;
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
 namespace Logic {
+    bool isWhitespace(char c);
+    bool isWhitespace(const string &str);
     string trim(const string &str);
     vector<string> split(string str, const char delim);
     vector<string> split(string str, const string &delim);

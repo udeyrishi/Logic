@@ -26,10 +26,6 @@ using namespace Logic;
 static const char DELIMITER = ';';
 static const string PROMPTS = ">> ";
 
-static bool isWhitespace(char c) {
-    return c == ' ' || c == '\t' || c == '\n';
-}
-
 void Interpreter::run() {
     string line;
     if (printPrompts) {

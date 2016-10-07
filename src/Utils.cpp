@@ -15,18 +15,45 @@
 */
 
 #include <Utils.hpp>
+#include <Exceptions.hpp>
 
 using namespace std;
 
 namespace Logic {
-    string trim(const string &str) {
-        size_t first = str.find_first_not_of(' ');
-        if (first == string::npos) {
-            first = 0;
+    bool isWhitespace(char c) {
+        return c == ' ' || c == '\t' || c == '\n' || c == '\r';
+    }
+
+    bool isWhitespace(const string &str) {
+        for (const char c : str) {
+            if (!isWhitespace(c)) {
+                return false;
+            }
         }
-        size_t last = str.find_last_not_of(' ');
+        return true;
+    }
+
+    string trim(const string &str) {
+        size_t first = string::npos;
+        for (size_t i = 0; i < str.length(); ++i) {
+            if (!isWhitespace(str.at(i))) {
+                first = i;
+                break;
+            }
+        }
+        if (first == string::npos) {
+            return "";
+        }
+
+        size_t last = string::npos;
+        for (size_t i = str.length(); i > 0; --i) {
+            if (!isWhitespace(str.at(i-1))) {
+                last = i-1;
+                break;
+            }
+        }
         if (last == string::npos) {
-            last = str.length();
+            throw IllegalStateException("Dev note: Iterated through the entire string backwards looking for a non-whitespace char. Not possible.");
         }
         return str.substr(first, (last-first+1));
     }
