@@ -15,19 +15,37 @@
 */
 
 #include <Utils.hpp>
-#include <regex>
-#include <stdexcept>
 
 using namespace std;
 
 namespace Logic {
     string trim(const string &str) {
-        const static regex whitespaceRemover("\\s*(.*)\\s*");
-        smatch sm;
-        if (regex_match(str, sm, whitespaceRemover, regex_constants::match_continuous)) {
-            return sm[1];
-        } else {
-            throw runtime_error("Unknown error occurred when trying to trim the string: " + str);
+        size_t first = str.find_first_not_of(' ');
+        if (first == string::npos) {
+            first = 0;
         }
+        size_t last = str.find_last_not_of(' ');
+        if (last == string::npos) {
+            last = str.length();
+        }
+        return str.substr(first, (last-first+1));
+    }
+
+    vector<string> split(string str, const char delim) {
+        return split(str, string(1, delim));
+    }
+
+    vector<string> split(string str, const string &delim) {
+        vector<string> parts;
+        size_t index;
+        while ((index = str.find(delim)) != string::npos) {
+            parts.push_back(str.substr(0, index));
+            str = str.substr(index + 1, string::npos);
+        }
+
+        if (!str.empty()) {
+            parts.push_back(str);
+        }
+        return parts;
     }
 }

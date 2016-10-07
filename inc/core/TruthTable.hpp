@@ -95,7 +95,7 @@ public:
     __TruthTableValueProxy operator[](const TruthTableUInt index);
     bool operator[](const TruthTableUInt index) const;
 
-    TruthTableCondition when(const string &variable, const bool value);
+    TruthTableCondition conditionBuilder();
 
     static bool getVariableValueInLine(TruthTableVariablesUInt columnNumber, TruthTableUInt lineIndex);
 private:
@@ -159,7 +159,7 @@ namespace Logic {
 
 class TruthTableCondition {
 public:
-    TruthTableCondition &when(const string &variable, const bool value);
+    void when(const string &variable, const bool value);
     TruthTable then();
 private:
     TruthTableCondition(const TruthTable &table) : table(table) {

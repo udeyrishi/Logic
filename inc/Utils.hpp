@@ -17,6 +17,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 using namespace std;
 // For explicitly removing -Wunused-parameter
@@ -24,6 +25,8 @@ using namespace std;
 
 namespace Logic {
     string trim(const string &str);
+    vector<string> split(string str, const char delim);
+    vector<string> split(string str, const string &delim);
 
     template <typename TCollection, typename TValue>
     bool contains(TCollection collection, TValue item) {

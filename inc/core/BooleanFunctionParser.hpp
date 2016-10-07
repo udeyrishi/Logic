@@ -31,6 +31,7 @@ public:
     void push(const UnaryOperator<bool> &_operator);
     void push(const BinaryOperator<bool> &_operator);
     BooleanFunction pop();
+    bool canBePopped();
 private:
     stack<BooleanFunction> _stack;
 };

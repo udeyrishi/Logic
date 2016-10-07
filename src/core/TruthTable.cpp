@@ -136,11 +136,11 @@ void TruthTable::validateIndex(const TruthTableUInt index) const {
     }
 }
 
-TruthTableCondition TruthTable::when(const string &variable, const bool value) {
-    return TruthTableCondition(*this).when(variable, value);
+TruthTableCondition TruthTable::conditionBuilder() {
+    return TruthTableCondition(*this);
 }
 
-TruthTableCondition &TruthTableCondition::when(const string &variable, const bool value) {
+void TruthTableCondition::when(const string &variable, const bool value) {
     const auto &hit = find(table.getVariables().begin(), table.getVariables().end(), variable);
     if (hit == table.getVariables().end()) {
         throw invalid_argument("variable not found in the truth table: " + variable);
@@ -152,7 +152,6 @@ TruthTableCondition &TruthTableCondition::when(const string &variable, const boo
     }
 
     conditions.insert(make_pair(position, value));
-    return *this;
 }
 
 TruthTable TruthTableCondition::then() {
