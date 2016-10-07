@@ -39,7 +39,7 @@ public:
 static const vector<string> PRINT_COMMAND({"print", "p"});
 class PrintBooleanFunctionCommand : public Command {
 public:
-    virtual bool execute(const string &functionName, Runtime &runtime, ostream &out);
+    virtual bool execute(const string &expression, Runtime &runtime, ostream &out);
 };
 
 static const vector<string> DELETE_COMMAND({"delete", "d"});
