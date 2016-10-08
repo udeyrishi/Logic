@@ -43,7 +43,7 @@ public:
      * Note: You should always use parenthesis to specify the operator precedence, because there is no agreed upon
      * natural precedence between the different binary operators (unary operators have a natural precedence--they apply to the
      * immediately following operand). For instance: "a | (b & d | !c) & c" can be interpreted as "(a | ((b & d) | !c)) & c"
-     * if using "greedy" precedence, or as "a | ((b & (d | !c)) & c)"" if using the "lazy" precedence.
+     * if using "greedy" precedence, or as "a | ((b & (d | !c)) & c)" if using the "lazy" precedence.
 
      * The convention for this parser is to use the latter lazy one.
      */
