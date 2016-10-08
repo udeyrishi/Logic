@@ -45,5 +45,9 @@ if __name__ == '__main__':
     if 'COMPILER' in os.environ:
         cmake_args.append('-DCMAKE_CXX_COMPILER=' + os.environ['COMPILER'])
     cmake_args.append('..')
-    call(cmake_args)
-    call(['make'])
+    code = call(cmake_args)
+    if code:
+        exit(code)
+    code = call(['make'])
+    if code:
+        exit(code)
