@@ -308,3 +308,83 @@ SCENARIO("A TruthTable stores the variable and data properly", "[TruthTable]") {
         }
     }
 }
+
+SCENARIO("A TruthTableBuilder builds a TruthTable") {
+    GIVEN("A TruthTableBuilder") {
+        TruthTableBuilder builder;
+
+        WHEN("The variables and values are all set") {
+            THEN("The TruthTable is properly built") {
+                builder.setVariables({"a", "b"});
+                builder.set(0, true);
+                builder.set(1, false);
+                builder.set(2, true);
+                builder.set(3, false);
+                TruthTable table = builder.build();
+                REQUIRE(table.size() == 4);
+                REQUIRE(table.getVariables().size() == 2);
+                REQUIRE(table.getVariables()[0] == "a");
+                REQUIRE(table.getVariables()[1] == "b");
+                REQUIRE(table[0]);
+                REQUIRE(!table[1]);
+                REQUIRE(table[2]);
+                REQUIRE(!table[3]);
+            }
+        }
+
+        WHEN("The variables are left unset") {
+            THEN("IllegalTruthTableException is thrown") {
+                builder.set(0, true);
+                builder.set(1, false);
+                CHECK_THROWS_AS({ builder.build(); }, IllegalTruthTableException);
+            }
+        }
+
+        WHEN("The values set != 2**numVariables") {
+            THEN("IllegalTruthTableException is thrown") {
+                builder.setVariables({"a"});
+                builder.set(0, true);
+                builder.set(1, false);
+                builder.set(2, false);
+                builder.set(3, false);
+                CHECK_THROWS_AS({ builder.build(); }, IllegalTruthTableException);
+            }
+        }
+
+        WHEN("The values for the same index are set multiple times") {
+            THEN("The values are overwrite, and the last value is kept") {
+                builder.setVariables({"a"});
+                builder.set(0, true);
+                builder.set(1, false);
+                builder.set(1, true);
+                TruthTable table = builder.build();
+                REQUIRE(table.size() == 2);
+                REQUIRE(table.getVariables().size() == 1);
+                REQUIRE(table.getVariables()[0] == "a");
+                REQUIRE(table[0]);
+                REQUIRE(table[1]);
+            }
+        }
+
+        WHEN("The variables are set multiple times") {
+            THEN("The variables are overwrite, and the last ones set are kept") {
+                builder.setVariables({"a"});
+                builder.set(0, true);
+                builder.set(1, false);
+                builder.setVariables({"a", "b"});
+                CHECK_THROWS_AS({ builder.build(); }, IllegalTruthTableException);
+                builder.set(2, false);
+                builder.set(3, false);
+                TruthTable table = builder.build();
+                REQUIRE(table.size() == 4);
+                REQUIRE(table.getVariables().size() == 2);
+                REQUIRE(table.getVariables()[0] == "a");
+                REQUIRE(table.getVariables()[1] == "b");
+                REQUIRE(table[0]);
+                REQUIRE(!table[1]);
+                REQUIRE(!table[2]);
+                REQUIRE(!table[3]);
+            }
+        }
+    }
+}
