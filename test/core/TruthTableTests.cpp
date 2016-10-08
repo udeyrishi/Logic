@@ -313,6 +313,25 @@ SCENARIO("A TruthTableBuilder builds a TruthTable", "[TruthTableBuilder]") {
     GIVEN("A TruthTableBuilder") {
         TruthTableBuilder builder;
 
+        WHEN("The variables and values are set") {
+            THEN("The accessors return correct values") {
+                // duplicates allowed when setting
+                builder.setVariables({"a", "a"});
+                builder.set(0, true);
+                builder.set(1, false);
+                builder.set(2, true);
+                builder.set(3, false);
+                REQUIRE(builder.getVariables().size() == 2);
+                REQUIRE(builder.getVariables()[0] == "a");
+                REQUIRE(builder.getVariables()[1] == "a");
+                REQUIRE(builder.getValue(0));
+                REQUIRE(!builder.getValue(1));
+                REQUIRE(builder.getValue(2));
+                REQUIRE(!builder.getValue(3));
+                REQUIRE(builder.tentativeSize() == 4);
+            }
+        }
+
         WHEN("The variables and values are all set") {
             THEN("The TruthTable is properly built") {
                 builder.setVariables({"a", "b"});

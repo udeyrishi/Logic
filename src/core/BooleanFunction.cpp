@@ -82,8 +82,8 @@ static bool shouldKeepLine(const vector<pair<string, vector<TruthTableVariablesU
     return true;
 }
 
-TruthTable BooleanFunction::combineColumnsWithSameVariables(const TruthTable &table) {
-    vector<pair<string, vector<TruthTableVariablesUInt>>> variableIndices = getVariableIndices(table.getVariables());
+TruthTable BooleanFunction::combineColumnsWithSameVariables(const TruthTableBuilder &rawBuilder) {
+    vector<pair<string, vector<TruthTableVariablesUInt>>> variableIndices = getVariableIndices(rawBuilder.getVariables());
 
     bool needsCombining = false;
     for (const auto &variable : variableIndices) {
@@ -94,7 +94,7 @@ TruthTable BooleanFunction::combineColumnsWithSameVariables(const TruthTable &ta
     }
 
     if (!needsCombining) {
-        return table;
+        return rawBuilder.build();
     }
 
     TruthTableBuilder builder;
@@ -104,27 +104,28 @@ TruthTable BooleanFunction::combineColumnsWithSameVariables(const TruthTable &ta
     }
     builder.setVariables(variables);
 
-    for (TruthTableUInt i = 0; i < table.size(); ++i) {
+    for (TruthTableUInt i = 0; i < rawBuilder.tentativeSize(); ++i) {
         if (shouldKeepLine(variableIndices, i)) {
-            builder.set(getLineIndexInCombinedTable((TruthTableVariablesUInt) table.getVariables().size(), i, variableIndices), table[i]);
+            builder.set(getLineIndexInCombinedTable((TruthTableVariablesUInt) rawBuilder.getVariables().size(), i, variableIndices), rawBuilder.getValue(i));
         }
     }
 
     return builder.build();
 }
 
-TruthTable BooleanFunction::combineTables(BinaryOperator<bool> &_operator, BooleanFunction &other) const {
+TruthTableBuilder BooleanFunction::combineTables(BinaryOperator<bool> &_operator, BooleanFunction &other) const {
     // By convention, this function's variables will have lower significance
     vector<string> variables = table.getVariables();
     // TODO: check that the variables don't have the same pointers
     variables.insert(variables.end(), other.getTruthTable().getVariables().begin(), other.getTruthTable().getVariables().end());
-    TruthTable resultingTable(variables);
+    TruthTableBuilder resultingTable;
+    resultingTable.setVariables(variables);
 
     TruthTableVariablesUInt numVariablesInThis = (TruthTableVariablesUInt) getTruthTable().getVariables().size();
-    for (TruthTableUInt i = 0; i < resultingTable.size(); ++i) {
+    for (TruthTableUInt i = 0; i < resultingTable.tentativeSize(); ++i) {
         bool operand1 = getTruthTable()[getFirstTablesIndex(i, numVariablesInThis)];
         bool operand2 = other.getTruthTable()[getOtherTablesIndex(i, numVariablesInThis)];
-        resultingTable[i] = _operator(operand1, operand2);
+        resultingTable.set(i, _operator(operand1, operand2));
     }
 
     return resultingTable;

@@ -42,8 +42,8 @@ public:
 private:
     TruthTable table;
 
-    TruthTable combineTables(BinaryOperator<bool> &_operator, BooleanFunction &other) const;
-    static TruthTable combineColumnsWithSameVariables(const TruthTable &table);
+    TruthTableBuilder combineTables(BinaryOperator<bool> &_operator, BooleanFunction &other) const;
+    static TruthTable combineColumnsWithSameVariables(const TruthTableBuilder &rawBuilder);
 };
 
 ostream &operator<<(ostream &os, const BooleanFunction &function);

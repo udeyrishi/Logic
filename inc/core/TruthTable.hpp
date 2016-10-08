@@ -138,6 +138,20 @@ public:
         this->variables = variables;
     }
 
+    vector<string> &getVariables() {
+        return variables;
+    }
+
+    vector<string> getVariables() const {
+        return variables;
+    }
+
+    bool getValue(const TruthTableUInt i) const {
+        return values[i];
+    }
+
+    TruthTableUInt tentativeSize() const;
+
     TruthTable build() const;
 
 private:

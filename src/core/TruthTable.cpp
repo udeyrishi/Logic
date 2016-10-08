@@ -206,6 +206,10 @@ void TruthTableBuilder::set(TruthTableUInt lineIndex, const bool b) {
     values[lineIndex] = b;
 }
 
+TruthTableUInt TruthTableBuilder::tentativeSize() const {
+    return (TruthTableUInt) pow(2, variables.size());
+}
+
 TruthTableVariablesUInt operator+(const TruthTableVariablesUInt &lhs, const TruthTableVariablesUInt &rhs) {
     return lhs + (uint64_t) rhs;
 }
