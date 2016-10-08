@@ -167,7 +167,7 @@ SCENARIO("TruthTableVariablesUInt behaves like a uint with range 0 <= x <= 64", 
 
 // TruthTableUInt is just a typedef right now, so tests is an overkill. Add if this is not true in the future
 
-SCENARIO("A TruthTable stores the variable and data properly", "[TruthTable]") {
+SCENARIO("A TruthTable stores the variable and data properly", "[TruthTable, TruthTableCondition]") {
     GIVEN("A 3-variable TruthTable") {
         TruthTable table({"a", "ball", "cat"});
 
@@ -309,7 +309,7 @@ SCENARIO("A TruthTable stores the variable and data properly", "[TruthTable]") {
     }
 }
 
-SCENARIO("A TruthTableBuilder builds a TruthTable") {
+SCENARIO("A TruthTableBuilder builds a TruthTable", "[TruthTableBuilder]") {
     GIVEN("A TruthTableBuilder") {
         TruthTableBuilder builder;
 
