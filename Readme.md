@@ -152,5 +152,7 @@ You can use the `:` token in a `let` command or in a `print` command. You can us
 #### `;` (the semi-colon sign):
 Marks the end of line of code. The first whitespace separated word between two successive `;` will be interpreted as the command, and everything else will be passed as the arguments to that command.
 
+#### `#` (the pound sign):
+A comment line.
 
 Congrats, you made it through! I'll be adding more features, and keeping this Readme updated. If you have a suggestion, leave an issue. If you have an improvement, leave a PR.

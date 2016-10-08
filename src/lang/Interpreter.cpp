@@ -25,6 +25,7 @@ using namespace Logic;
 
 static const char DELIMITER = ';';
 static const string PROMPTS = ">> ";
+static const char COMMMENT_TOKEN = '#';
 
 void Interpreter::run() {
     string line;
@@ -48,8 +49,8 @@ void Interpreter::run() {
             }
         }
         string commandString = trim(line.substr(start, i - start));
-        // If empty line, ignore it.
-        if (commandString.length() != 0) {
+        // If empty or commentline, ignore it.
+        if (commandString.length() != 0 && commandString.at(0) != COMMMENT_TOKEN) {
             while (i < line.length() && isWhitespace(lineChars[i])) {
                 ++i;
             }
