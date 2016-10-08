@@ -54,5 +54,5 @@ before_install:
 script:
   - ./build.py
   - ./build.py -d
-  - ./debug/bin/run_tests
-  - ./release/bin/run_tests
+  - ./debug/bin/run_tests -d yes --order rand
+  - ./release/bin/run_tests -d yes --order rand
