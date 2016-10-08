@@ -1,12 +1,12 @@
 /**
  Copyright 2016 Udey Rishi
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
     http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@
 #include <catch.hpp>
 #include <core/TruthTable.hpp>
 #include <sstream>
+#include <Exceptions.hpp>
 
 using namespace Logic;
 
@@ -160,6 +161,150 @@ SCENARIO("TruthTableVariablesUInt behaves like a uint with range 0 <= x <= 64", 
                 oss << y;
                 REQUIRE(oss.str() == "12");
             }
+        }
+    }
+}
+
+// TruthTableUInt is just a typedef right now, so tests is an overkill. Add if this is not true in the future
+
+SCENARIO("A TruthTable stores the variable and data properly", "[TruthTable]") {
+    GIVEN("A 3-variable TruthTable") {
+        TruthTable table({"a", "ball", "cat"});
+
+        REQUIRE(table.size() == 8);
+        REQUIRE(table.getVariables().size() == 3);
+        REQUIRE(table.getVariables()[0] == "a");
+        REQUIRE(table.getVariables()[1] == "ball");
+        REQUIRE(table.getVariables()[2] == "cat");
+
+        REQUIRE(TruthTable::getVariableValueInLine(0, 0) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(1, 0) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(2, 0) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(3, 0) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(4, 0) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(0, 1) == 1);
+        REQUIRE(TruthTable::getVariableValueInLine(1, 1) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(2, 1) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(3, 1) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(4, 1) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(0, 2) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(1, 2) == 1);
+        REQUIRE(TruthTable::getVariableValueInLine(2, 2) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(3, 2) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(4, 2) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(0, 6) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(1, 6) == 1);
+        REQUIRE(TruthTable::getVariableValueInLine(2, 6) == 1);
+        REQUIRE(TruthTable::getVariableValueInLine(3, 6) == 0);
+        REQUIRE(TruthTable::getVariableValueInLine(4, 6) == 0);
+
+        WHEN("The [] operator is used within table's range") {
+            THEN("The table's value can be set and retrieved at that index") {
+                for (TruthTableUInt i = 0; i < table.size(); ++i) {
+                    REQUIRE(!table[i]);
+                }
+                table[5] = !table[5];
+                for (TruthTableUInt i = 0; i < table.size(); ++i) {
+                    if (i == 5) {
+                        REQUIRE(table[i]);
+                    } else {
+                        REQUIRE(!table[i]);
+                    }
+                }
+                table[4] = !table[5];
+                for (TruthTableUInt i = 0; i < table.size(); ++i) {
+                    if (i == 5) {
+                        REQUIRE(table[i]);
+                    } else {
+                        REQUIRE(!table[i]);
+                    }
+                }
+            }
+        }
+
+        WHEN("The [] operator is used outside of table's range") {
+            THEN("out_of_range exception is thrown") {
+                CHECK_THROWS_AS({ table[8]; }, out_of_range);
+                CHECK_THROWS_AS({ table[52]; }, out_of_range);
+                CHECK_THROWS_AS({ table[8] = true; }, out_of_range);
+            }
+        }
+
+        WHEN("You apply a condition on a variable") {
+            THEN("The correct resulting table is generated") {
+                // a & b;
+                table[3] = true;
+                table[7] = true;
+
+                TruthTableCondition condition = table.conditionBuilder();
+                condition.when("a", true);
+                condition.when("ball", true);
+                TruthTable result = condition.then();
+
+                REQUIRE(result.size() == 2);
+                REQUIRE(result.getVariables().size() == 1);
+                REQUIRE(result.getVariables()[0] == "cat");
+                REQUIRE(result[0] == true);
+                REQUIRE(result[1] == true);
+            }
+        }
+
+        WHEN("You apply a condition on a variable that does not exist") {
+            THEN("invalid_argument exception is thrown") {
+                CHECK_THROWS_AS({ table.conditionBuilder().when("b", true); }, invalid_argument);
+            }
+        }
+
+        WHEN("You apply a condition on a variable multiple times") {
+            THEN("The values overwrite, and the last one is kept") {
+                TruthTableCondition condition = table.conditionBuilder();
+                condition.when("a", true);
+                condition.when("a", false);
+                TruthTable result = condition.then();
+                REQUIRE(result.size() == 4);
+                REQUIRE(result.getVariables().size() == 2);
+                REQUIRE(result.getVariables()[0] == "ball");
+                REQUIRE(result.getVariables()[1] == "cat");
+                REQUIRE(result[0] == false);
+                REQUIRE(result[1] == false);
+                REQUIRE(result[2] == false);
+                REQUIRE(result[3] == false);
+            }
+        }
+
+        // TODO: This is the current behaviour. Maybe this can be better?
+        WHEN("You apply a condition to all the variables") {
+            THEN("IllegalTruthTableException is thrown when creating the resulting table") {
+                TruthTableCondition condition = table.conditionBuilder();
+                condition.when("a", true);
+                condition.when("ball", true);
+                condition.when("cat", false);
+                CHECK_THROWS_AS({ condition.then(); }, IllegalTruthTableException);
+            }
+        }
+    }
+
+    WHEN("You try to create a truthtable with no variables") {
+        THEN("invalid_argument exception is thrown") {
+            CHECK_THROWS_AS({ TruthTable({}); }, invalid_argument);
+        }
+    }
+
+    WHEN("You try to create a truthtable with > 64 variables") {
+        THEN("invalid_argument exception is thrown") {
+            vector<string> vars;
+            for (int i = 0; i < 65; ++i) {
+                vars.push_back(string(1, 'a' + (char)i));
+            }
+            CHECK_THROWS_AS({ TruthTable x(vars); }, invalid_argument);
+            vars.push_back("hello");
+            CHECK_THROWS_AS({ TruthTable x(vars); }, invalid_argument);
+        }
+    }
+
+    WHEN("You try to create a truthtable with duplicate variables") {
+        THEN("invalid_argument exception is thrown") {
+            CHECK_THROWS_AS({ TruthTable({"x", "hello", "x"}); }, invalid_argument);
         }
     }
 }
