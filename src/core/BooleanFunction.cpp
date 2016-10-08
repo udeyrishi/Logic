@@ -1,12 +1,12 @@
 /**
  Copyright 2016 Udey Rishi
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
     http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -113,7 +113,7 @@ TruthTable BooleanFunction::combineColumnsWithSameVariables(const TruthTable &ta
     return builder.build();
 }
 
-TruthTable BooleanFunction::combineTables(const BinaryOperator<bool> &_operator, BooleanFunction &other) const {
+TruthTable BooleanFunction::combineTables(BinaryOperator<bool> &_operator, BooleanFunction &other) const {
     // By convention, this function's variables will have lower significance
     vector<string> variables = table.getVariables();
     // TODO: check that the variables don't have the same pointers
@@ -130,7 +130,7 @@ TruthTable BooleanFunction::combineTables(const BinaryOperator<bool> &_operator,
     return resultingTable;
 }
 
-BooleanFunction BooleanFunction::operate(const UnaryOperator<bool> &_operator) const {
+BooleanFunction BooleanFunction::operate(UnaryOperator<bool> &_operator) const {
     BooleanFunction result(*this);
     for (TruthTableUInt i = 0; i < table.size(); ++i) {
         result.table[i] = _operator(table[i]);
@@ -138,7 +138,7 @@ BooleanFunction BooleanFunction::operate(const UnaryOperator<bool> &_operator) c
     return result;
 }
 
-BooleanFunction BooleanFunction::operate(const BinaryOperator<bool> &_operator, BooleanFunction &other) const {
+BooleanFunction BooleanFunction::operate(BinaryOperator<bool> &_operator, BooleanFunction &other) const {
     return BooleanFunction(combineColumnsWithSameVariables(combineTables(_operator, other)));
 }
 

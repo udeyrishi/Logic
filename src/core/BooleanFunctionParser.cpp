@@ -67,14 +67,14 @@ void BooleanFunctionAccumulator::push(const BooleanFunction &function) {
     _stack.push(function);
 }
 
-void BooleanFunctionAccumulator::push(const UnaryOperator<bool> &_operator) {
+void BooleanFunctionAccumulator::push(UnaryOperator<bool> &_operator) {
     if (_stack.empty()) {
         throw IllegalStateException("Cannot push a unary operator on an empty stack.");
     }
     _stack.push(topAndPop(_stack).operate(_operator));
 }
 
-void BooleanFunctionAccumulator::push(const BinaryOperator<bool> &_operator) {
+void BooleanFunctionAccumulator::push(BinaryOperator<bool> &_operator) {
     if (_stack.size() < 2) {
         throw IllegalStateException("Cannot push a binary operator on an stack of size less than 2");
     }

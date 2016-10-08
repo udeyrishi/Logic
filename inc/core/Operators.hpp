@@ -1,12 +1,12 @@
 /**
  Copyright 2016 Udey Rishi
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
     http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@ static const vector<string> OPERATOR_REGEXES({ "["   + NOT_SYMBOL + "]",
 template <typename T>
 class UnaryOperator {
 public:
-    virtual T operator()(const T in) const = 0;
+    virtual T operator()(const T in) = 0;
     virtual ~UnaryOperator() {
     }
 };
@@ -44,7 +44,7 @@ public:
 template <typename T>
 class BinaryOperator {
 public:
-    virtual T operator()(const T first, const T second) const = 0;
+    virtual T operator()(const T first, const T second) = 0;
     virtual ~BinaryOperator() {
     }
 };
@@ -52,7 +52,7 @@ public:
 template <typename T>
 class Not : public UnaryOperator<T> {
 public:
-    virtual T operator()(const T in) const {
+    virtual T operator()(const T in) {
         return !in;
     }
 };
@@ -60,7 +60,7 @@ public:
 template <typename T>
 class Or : public BinaryOperator<T> {
 public:
-    virtual T operator()(const T first, const T second) const {
+    virtual T operator()(const T first, const T second) {
         return first || second;
     }
 };
@@ -68,7 +68,7 @@ public:
 template <typename T>
 class And : public BinaryOperator<T> {
 public:
-    virtual T operator()(const T first, const T second) const {
+    virtual T operator()(const T first, const T second) {
         return first && second;
     }
 };
@@ -76,7 +76,7 @@ public:
 template <typename T>
 class Xor : public BinaryOperator<T> {
 public:
-    virtual T operator()(const T first, const T second) const {
+    virtual T operator()(const T first, const T second) {
         return first != second;
     }
 };

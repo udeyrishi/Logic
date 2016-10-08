@@ -28,8 +28,8 @@ namespace Logic {
 class BooleanFunctionAccumulator {
 public:
     void push(const BooleanFunction &function);
-    void push(const UnaryOperator<bool> &_operator);
-    void push(const BinaryOperator<bool> &_operator);
+    void push(UnaryOperator<bool> &_operator);
+    void push(BinaryOperator<bool> &_operator);
     BooleanFunction pop();
     bool canBePopped();
 private:
