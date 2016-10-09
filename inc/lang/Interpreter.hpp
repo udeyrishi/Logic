@@ -32,6 +32,7 @@ public:
         : runtime(runtime), in(in), out(out), printPrompts(printPrompts) {
     }
 
+    void start();
     void run();
 
 private:
@@ -49,5 +50,8 @@ private:
         UNUSED(rhs);
         throw runtime_error("Copying Interpreter object not allowed.");
     }
+
+    string nextLine(istream &in);
+    void printPromptsIfNeeded();
 };
 }

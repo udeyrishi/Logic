@@ -30,6 +30,7 @@ int main(int argc, char **argv) {
         runtime = new Runtime();
         interpreter = new Interpreter(*runtime, cin, cout, true);
 
+        interpreter->start();
         while (true) {
             try {
                 interpreter->run();
@@ -43,6 +44,7 @@ int main(int argc, char **argv) {
         ifstream infile(path);
         runtime = new Runtime();
         interpreter = new Interpreter(*runtime, infile, cout);
+        interpreter->start();
         try {
             interpreter->run();
         } catch (const exception &ex) {

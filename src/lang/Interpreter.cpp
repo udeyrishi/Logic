@@ -19,53 +19,84 @@
 #include <lang/Command.hpp>
 #include <Utils.hpp>
 #include <Exceptions.hpp>
+#include <sstream>
 
 using namespace std;
-using namespace Logic;
 
-static const char DELIMITER = ';';
-static const string PROMPTS = ">> ";
-static const char COMMMENT_TOKEN = '#';
+namespace Logic {
+static constexpr char DELIMITER = ';';
+static constexpr char COMMMENT_TOKEN = '#';
 
-void Interpreter::run() {
-    string line;
+void Interpreter::printPromptsIfNeeded() {
+    static const string PROMPTS = ">> ";
     if (printPrompts) {
         cout << PROMPTS;
     }
+}
 
-    while (getline(in, line, DELIMITER)) {
-        const char *lineChars = line.c_str();
-        uint64_t i;
-
-        // There could be some whitespace after the DELIMITER on the previous line
-        bool nonSpaceCharFound = false;
-        uint64_t start = 0;
-        for (i = 0; i < line.length(); ++i) {
-            if (isWhitespace(lineChars[i]) && nonSpaceCharFound) {
-                break;
-            } else if (!isWhitespace(lineChars[i]) && !nonSpaceCharFound) {
-                nonSpaceCharFound = true;
-                start = i;
-            }
-        }
-        string commandString = trim(line.substr(start, i - start));
-        // If empty or commentline, ignore it.
-        if (commandString.length() != 0 && commandString.at(0) != COMMMENT_TOKEN) {
-            while (i < line.length() && isWhitespace(lineChars[i])) {
-                ++i;
-            }
-            // args can be empty
-            string args = trim(line.substr(i, string::npos));
-            Command *command = getCommand(commandString);
-            bool _continue = command->execute(args, runtime, out);
-            delete command;
-            if (!_continue) {
-                break;
-            }
+string Interpreter::nextLine(istream &in) {
+    stringstream input;
+    bool commentOngoing = false;
+    char c;
+    while ((c = (char) in.get())) {
+        if (c == '\r') {
+            // Leftover from a previous \n in Windows
+            continue;
         }
 
-        if (printPrompts) {
-            cout << PROMPTS;
+        if (c == '\n') {
+            commentOngoing = false;
+            if (trim(input.str()).length() == 0) {
+                // Nothing entered so far. Reset everything
+                input = stringstream();
+                printPromptsIfNeeded();
+            } else {
+                // Newline is equivalent to space in parsing
+                input << ' ';
+            }
+            continue;
+        }
+
+        if (!commentOngoing) {
+            if (c == DELIMITER) {
+                string stringInput = trim(input.str());
+                if (stringInput.length() != 0) {
+                    return stringInput;
+                }
+            } else if (c == COMMMENT_TOKEN) {
+                commentOngoing = true;
+            } else {
+                input << c;
+            }
         }
     }
+
+    string stringInput = trim(input.str());
+    if (stringInput.length() == 0) {
+        // eof, with all preveious commands terminated with a ';'
+        return stringInput;
+    }
+    throw UnexpectedEOFException("Parsed incomplete line at the end of the stream that didn't have a terminating semi-colon: " + stringInput);
+}
+
+void Interpreter::start() {
+    printPromptsIfNeeded();
+}
+
+void Interpreter::run() {
+    string line;
+    while ((line = nextLine(in)).length() > 0) {
+        uint64_t argLocation = 0;
+        for (; argLocation < line.length() && !isWhitespace(line.at(argLocation)); ++argLocation);
+
+        string commandString = line.substr(0, argLocation);
+        string args = trim(line.substr(argLocation, string::npos));
+        Command *command = getCommand(commandString);
+        bool _continue = command->execute(args, runtime, out);
+        delete command;
+        if (!_continue) {
+            break;
+        }
+    }
+}
 }
