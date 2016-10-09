@@ -25,7 +25,7 @@ using namespace std;
 
 int main(int argc, char **argv) {
     Runtime *runtime = nullptr;
-    Interpreter* interpreter = nullptr;
+    Interpreter *interpreter = nullptr;
     if (argc == 1) {
         runtime = new Runtime();
         interpreter = new Interpreter(*runtime, cin, cout, true);

@@ -27,6 +27,11 @@ namespace Logic {
 static constexpr char DELIMITER = ';';
 static constexpr char COMMMENT_TOKEN = '#';
 
+static void clearStringStream(stringstream &ss) {
+    ss.str(string());
+    ss.clear();
+}
+
 void Interpreter::printPromptsIfNeeded() {
     static const string PROMPTS = ">> ";
     if (printPrompts) {
@@ -48,7 +53,7 @@ string Interpreter::nextLine(istream &in) {
             commentOngoing = false;
             if (trim(input.str()).length() == 0) {
                 // Nothing entered so far. Reset everything
-                input = stringstream();
+                clearStringStream(input);
                 printPromptsIfNeeded();
             } else {
                 // Newline is equivalent to space in parsing
@@ -60,7 +65,9 @@ string Interpreter::nextLine(istream &in) {
         if (!commentOngoing) {
             if (c == DELIMITER) {
                 string stringInput = trim(input.str());
-                if (stringInput.length() != 0) {
+                if (stringInput.length() == 0) {
+                    clearStringStream(input);
+                } else {
                     return stringInput;
                 }
             } else if (c == COMMMENT_TOKEN) {
