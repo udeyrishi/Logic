@@ -40,6 +40,38 @@ SCENARIO("A BooleanFunction contains the correct TruthTable", "[BooleanFunction]
                 REQUIRE(&table != &function.getTruthTable());
             }
         }
+
+        WHEN("The function is compared with an equal function") {
+            TruthTable table2({"a", "b"});
+            table2[0] = true;
+            BooleanFunction function2(table2);
+            bool result = function == function2;
+
+            THEN("The result is true") {
+                REQUIRE(result);
+            }
+        }
+
+        WHEN("The function is compared with the same function but with different variables") {
+            TruthTable table2({"x", "y"});
+            table2[0] = true;
+            BooleanFunction function2(table2);
+            bool result = function == function2;
+
+            THEN("The result is false") {
+                REQUIRE(!result);
+            }
+        }
+
+        WHEN("The function is compared with a different function") {
+            TruthTable table2({"a", "b"});
+            BooleanFunction function2(table2);
+
+            bool result = function == function2;
+            THEN("The result is false") {
+                REQUIRE(!result);
+            }
+        }
     }
 }
 

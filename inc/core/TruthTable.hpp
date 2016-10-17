@@ -105,9 +105,11 @@ private:
     void validateIndex(const TruthTableUInt index) const;
 
     friend class __TruthTableValueProxy;
+    friend bool operator==(const TruthTable &left, const TruthTable &right);
 };
 
 ostream &operator<<(ostream &os, const TruthTable &table);
+bool operator==(const TruthTable &left, const TruthTable &right);
 
 // This type should not be used directly by keeping a variable. It should be either converted to a bool, or used for assignment.
 class __TruthTableValueProxy {

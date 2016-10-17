@@ -47,4 +47,6 @@ private:
 };
 
 ostream &operator<<(ostream &os, const BooleanFunction &function);
+bool operator==(const BooleanFunction &left, const BooleanFunction &right);
+
 }

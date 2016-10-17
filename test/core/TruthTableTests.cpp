@@ -309,6 +309,41 @@ SCENARIO("A TruthTable stores the variable and data properly", "[TruthTable, Tru
     }
 }
 
+SCENARIO("A TruthTable equiality operator works properly", "[TruthTable]") {
+    GIVEN("A TruthTable") {
+        TruthTable table({"x", "y"});
+        table[3] = true;
+
+        WHEN("The TruthTable is compared with an equal table") {
+            TruthTable table2({"x", "y"});
+            table2[3] = true;
+            bool result = table == table2;
+
+            THEN("The result is true") {
+                REQUIRE(result);
+            }
+        }
+
+        WHEN("The TruthTable is compared with the same table but with different variables") {
+            TruthTable table2({"a", "b"});
+            table2[3] = true;
+            bool result = table == table2;
+
+            THEN("The result is false") {
+                REQUIRE(!result);
+            }
+        }
+
+        WHEN("The TruthTable is compared with a different table") {
+            TruthTable table2({"a", "b"});
+            bool result = table == table2;
+            THEN("The result is false") {
+                REQUIRE(!result);
+            }
+        }
+    }
+}
+
 SCENARIO("A TruthTableBuilder builds a TruthTable", "[TruthTableBuilder]") {
     GIVEN("A TruthTableBuilder") {
         TruthTableBuilder builder;

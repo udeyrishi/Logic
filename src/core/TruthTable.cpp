@@ -130,6 +130,11 @@ bool TruthTable::operator[](const TruthTableUInt index) const {
     return values[index];
 }
 
+bool operator==(const TruthTable &left, const TruthTable &right) {
+    return left.getVariables() == right.getVariables() &&
+           left.values == right.values;
+}
+
 void TruthTable::validateIndex(const TruthTableUInt index) const {
     if (index >= size()) {
         throw out_of_range("index needs to be in range: [0, " + to_string(size() - 1) + "]");

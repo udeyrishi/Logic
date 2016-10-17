@@ -147,4 +147,8 @@ ostream &operator<<(ostream &os, const BooleanFunction &function) {
     os << function.getTruthTable();
     return os;
 }
+
+bool operator==(const BooleanFunction &left, const BooleanFunction &right) {
+    return left.getTruthTable() == right.getTruthTable();
+}
 }
