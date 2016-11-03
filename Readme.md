@@ -9,7 +9,10 @@ This has been tested to work on macOS and Linux. _Should_ work on Windows as wel
 
 Requirements:
 
-* clang++ (might work with g++, but not tested)
+* One of (might work with other compilers and/or OSes, but not tested):
+	* macOS with LLVM/clang++ 7.3.0+
+	* Linux with g++ 4.9+
+	* Linux with clang++ 3.6+ 
 * cmake
 * make
 * [Optional] Python
@@ -21,7 +24,7 @@ cmake . && make logic
 # To compile the logic_tests executable
 cmake . && make logic_tests
 
-# Or to do everything, use this handy script
+# Or to do everything, use this handy script.
 # Use flag -d for the debug version
 # This will output to the release/bin (or debug/bin) directory
 ./build.py
@@ -155,4 +158,5 @@ Marks the end of line of code. The first whitespace separated word between two s
 #### `#` (the pound sign):
 A comment line.
 
+---
 Congrats, you made it through! I'll be adding more features, and keeping this Readme updated. If you have a suggestion, leave an issue. If you have an improvement, leave a PR.
