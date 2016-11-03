@@ -18,8 +18,8 @@ Requirements:
 # This will put the binaries in ./bin
 cmake . && make logic
 
-# To compile the run_tests executable
-cmake . && make run_tests
+# To compile the logic_tests executable
+cmake . && make logic_tests
 
 # Or to do everything, use this handy script
 # Use flag -d for the debug version
@@ -38,7 +38,7 @@ logic
 logic <path to file>
 
 # To run the tests:
-path/to/binary/run_tests
+path/to/binary/logic_tests
 ```
 
 ##Language basics
@@ -82,7 +82,7 @@ The list of currently defined commands, their aliases in the parenthesis, and wh
 * `|`: Binary operator 'or'
 * `^`: Binary opeartor 'xor'
 * `!`: Unary operator 'not'
-* `(`, `)`: Parenthesis for specifying operator precedence. 
+* `(`, `)`: Parenthesis for specifying operator precedence.
 
 Note: You should always use parenthesis to specify the operator precedence, because there is no agreed upon natural precedence between the different binary operators (unary operators have a natural precedence--they apply to the immediately following operand). For instance: `a | (b & d | !c) & c` can be interpreted as `(a | ((b & d) | !c)) & c` if using _greedy_ precedence, or as `a | ((b & (d | !c)) & c)` if using the _lazy_ precedence.
 The convention here is to use the latter _lazy_ one.
@@ -90,7 +90,7 @@ The convention here is to use the latter _lazy_ one.
 ###Special tokens
 There are some special tokens that you can use in a Boolean function:
 
-#### `$` (the dollar sign) 
+#### `$` (the dollar sign)
 When used immediately before a symbol, that symbol is used as the name of Boolean function defined before in your program (vs. an independent variable in your function). E.g.:
 
 ```
@@ -128,7 +128,7 @@ Here, even though the value of the Boolean function named `x` is changed later t
 
 Also note that the `$` has the highest precedence. For instance, in the above example, the value of `x` is first computed, and then xor-ed with `c` to get the Boolean function for `y`. So, the equivalent definition would be `let y = (a & b) ^ c;` (and not `a & (b ^ c)`, which would've been the case if you went `let y = a & b ^ c`).
 
-#### `:` (the colon sign): 
+#### `:` (the colon sign):
 You can use the colon sign towards the end of the Boolean function to specify a comma separated list of values of certain variables. This will then collapse the function by abiding to these conditions, and only return the result. e.g.:
 
 ```
