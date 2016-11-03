@@ -19,8 +19,8 @@
 #include <stdint.h>
 #include <mutex>
 #include <regex>
-#include <Exceptions.hpp>
-#include <Utils.hpp>
+#include <core/Exceptions.hpp>
+#include <core/Utils.hpp>
 #include <utility>
 
 using namespace Logic;

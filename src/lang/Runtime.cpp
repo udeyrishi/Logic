@@ -15,7 +15,7 @@
 */
 
 #include <lang/Runtime.hpp>
-#include <Exceptions.hpp>
+#include <lang/Exceptions.hpp>
 
 using namespace std;
 

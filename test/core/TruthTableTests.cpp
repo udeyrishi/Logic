@@ -17,7 +17,7 @@
 #include <catch.hpp>
 #include <core/TruthTable.hpp>
 #include <sstream>
-#include <Exceptions.hpp>
+#include <core/Exceptions.hpp>
 
 using namespace Logic;
 

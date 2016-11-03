@@ -17,8 +17,8 @@
 #include <lang/Interpreter.hpp>
 #include <string>
 #include <lang/Command.hpp>
-#include <Utils.hpp>
-#include <Exceptions.hpp>
+#include <core/Utils.hpp>
+#include <lang/Exceptions.hpp>
 #include <sstream>
 
 using namespace std;

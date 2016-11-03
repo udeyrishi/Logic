@@ -59,27 +59,9 @@ public:
     }
 };
 
-class UnknownCommandException : public LogicException {
-public:
-    UnknownCommandException(const string &message) : LogicException(message) {
-    }
-};
-
-class BadCommandArgumentsException : public LogicException {
-public:
-    BadCommandArgumentsException(const string &message) : LogicException(message) {
-    }
-};
-
 class BooleanFunctionNotFoundException : public LogicException {
 public:
     BooleanFunctionNotFoundException(const string &message) : LogicException(message) {
-    }
-};
-
-class UnexpectedEOFException : public LogicException {
-public:
-    UnexpectedEOFException(const string &message) : LogicException(message) {
     }
 };
 }

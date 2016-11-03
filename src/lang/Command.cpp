@@ -17,8 +17,8 @@
 #include <lang/Command.hpp>
 #include <regex>
 #include <core/BooleanFunctionParser.hpp>
-#include <Exceptions.hpp>
-#include <Utils.hpp>
+#include <lang/Exceptions.hpp>
+#include <core/Utils.hpp>
 #include <algorithm>
 
 using namespace std;

@@ -16,7 +16,7 @@
 
 #include <catch.hpp>
 #include <core/BooleanFunction.hpp>
-#include <Utils.hpp>
+#include <core/Utils.hpp>
 
 using namespace Logic;
 

@@ -16,7 +16,7 @@
 
 #include <core/TruthTable.hpp>
 #include <iostream>
-#include <Exceptions.hpp>
+#include <core/Exceptions.hpp>
 #include <algorithm>
 #include <unordered_set>
 
