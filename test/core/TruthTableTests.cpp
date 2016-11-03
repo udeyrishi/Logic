@@ -33,10 +33,7 @@ SCENARIO("TruthTableVariablesUInt behaves like a uint with range 0 <= x <= 64", 
         REQUIRE((int32_t) TruthTableVariablesUInt(45) == 45);
         REQUIRE((int64_t) TruthTableVariablesUInt(45) == 45);
         REQUIRE((int64_t) TruthTableVariablesUInt(64) == 64);
-        REQUIRE(TruthTableVariablesUInt(45) >= -52);
-        REQUIRE(TruthTableVariablesUInt(45) > -52);
         REQUIRE(TruthTableVariablesUInt(45) > 0);
-        REQUIRE(TruthTableVariablesUInt(45) >= 0);
         REQUIRE(TruthTableVariablesUInt(45) < 46);
         REQUIRE(TruthTableVariablesUInt(45) <= 46);
         REQUIRE(TruthTableVariablesUInt(45) < 123);
