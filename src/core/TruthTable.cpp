@@ -183,7 +183,14 @@ TruthTable TruthTableCondition::then() {
         }
     }
     builder.setVariables(newVariables);
-    return builder.build();
+    try {
+        return builder.build();
+    } catch (const IllegalTruthTableException &ex) {
+        throw IllegalTruthTableException(
+            string("The result is the constant ") +
+            string(builder.getValue(0) ? "'true'" : "'false'") +
+            string(" that cannot be stored in a truth table."));
+    }
 }
 
 TruthTable TruthTableBuilder::build() const {

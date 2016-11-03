@@ -272,7 +272,6 @@ SCENARIO("A TruthTable stores the variable and data properly", "[TruthTable, Tru
             }
         }
 
-        // TODO: This is the current behaviour. Maybe this can be better?
         WHEN("You apply a condition to all the variables") {
             THEN("IllegalTruthTableException is thrown when creating the resulting table") {
                 TruthTableCondition condition = table.conditionBuilder();
