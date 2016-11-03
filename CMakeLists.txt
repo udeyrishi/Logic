@@ -34,11 +34,12 @@ add_library(${CORE_LIB} STATIC ${CORE_LIB_SOURCES})
 # The lang library
 file(GLOB_RECURSE LANG_LIB_SOURCES ${SRC_DIR}/${LANG_MODULE}/*.${SRC_EXT})
 add_library(${LANG_LIB} STATIC ${LANG_LIB_SOURCES})
+# lang lib depends on core
+target_link_libraries(${LANG_LIB} ${CORE_LIB})
 
 # The main binary
 add_executable(${TARGET} ${SRC_DIR}/${MAIN_CPP})
 include_directories(${INC_DIR})
-target_link_libraries(${TARGET} ${CORE_LIB})
 target_link_libraries(${TARGET} ${LANG_LIB})
 
 # The Catch testing library
@@ -49,7 +50,6 @@ target_include_directories(${TEST_LIB} INTERFACE ${TEST_DIR}/${INC_DIR})
 file(GLOB_RECURSE TEST_SOURCES ${TEST_DIR}/*.${SRC_EXT})
 add_executable(${TEST_TARGET} ${TEST_SOURCES})
 target_link_libraries(${TEST_TARGET} ${TEST_LIB})
-target_link_libraries(${TEST_TARGET} ${CORE_LIB})
 target_link_libraries(${TEST_TARGET} ${LANG_LIB})
 
 # Expose tests to CMake
