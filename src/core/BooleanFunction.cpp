@@ -15,6 +15,7 @@
 */
 
 #include <core/BooleanFunction.hpp>
+#include <core/Exceptions.hpp>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -115,8 +116,7 @@ TruthTable BooleanFunction::combineColumnsWithSameVariables(const TruthTableBuil
 
 TruthTableBuilder BooleanFunction::combineTables(BinaryOperator<bool> &_operator, BooleanFunction &other) const {
     // By convention, this function's variables will have lower significance
-    vector<string> variables = table.getVariables();
-    // TODO: check that the variables don't have the same pointers
+    vector<string> variables = table->getVariables();
     variables.insert(variables.end(), other.getTruthTable().getVariables().begin(), other.getTruthTable().getVariables().end());
     TruthTableBuilder resultingTable;
     resultingTable.setVariables(variables);
@@ -133,22 +133,141 @@ TruthTableBuilder BooleanFunction::combineTables(BinaryOperator<bool> &_operator
 
 BooleanFunction BooleanFunction::operate(UnaryOperator<bool> &_operator) const {
     BooleanFunction result(*this);
-    for (TruthTableUInt i = 0; i < table.size(); ++i) {
-        result.table[i] = _operator(table[i]);
+    if (isConstant()) {
+        result.getConstantValue() = _operator(getConstantValue());
+    } else {
+        for (TruthTableUInt i = 0; i < table->size(); ++i) {
+            result.getTruthTable()[i] = _operator(getTruthTable()[i]);
+        }
     }
+
     return result;
 }
 
 BooleanFunction BooleanFunction::operate(BinaryOperator<bool> &_operator, BooleanFunction &other) const {
-    return BooleanFunction(combineColumnsWithSameVariables(combineTables(_operator, other)));
+    if (hasTruthTable() && other.hasTruthTable()) {
+        // Combining two regular Boolean functions
+        return BooleanFunction(combineColumnsWithSameVariables(combineTables(_operator, other)));
+    }
+
+    if (!hasTruthTable() && !other.hasTruthTable()) {
+        // Just combining two constant bools
+        return BooleanFunction(_operator(getConstantValue(), other.getConstantValue()));
+    }
+
+    // Combining one truthtable Boolean function with a constant one
+    TruthTable clone = hasTruthTable() ? getTruthTable() : other.getTruthTable();
+    for (TruthTableUInt i = 0; i < clone.size(); ++i) {
+        // The order of args might be important, because the binary operator may or may not be reflexive
+        if (hasTruthTable()) {
+            clone[i] = _operator(getTruthTable()[i], other.getConstantValue());
+        } else {
+            clone[i] = _operator(getConstantValue(), other.getTruthTable()[i]);
+        }
+    }
+    return BooleanFunction(clone);
 }
 
 ostream &operator<<(ostream &os, const BooleanFunction &function) {
-    os << function.getTruthTable();
+    if (function.isConstant()) {
+        os << (function.getConstantValue() ? "true" : "false");
+    } else {
+        os << function.getTruthTable();
+    }
+
     return os;
 }
 
 bool operator==(const BooleanFunction &left, const BooleanFunction &right) {
-    return left.getTruthTable() == right.getTruthTable();
+    if (left.isConstant() && right.isConstant()) {
+        return left.getConstantValue() == right.getConstantValue();
+    }
+
+    if (left.hasTruthTable() && right.hasTruthTable()) {
+        return left.getTruthTable() == right.getTruthTable();
+    }
+
+    return false;
+}
+
+BooleanFunction::BooleanFunction(const TruthTable &table) : constValue(nullptr) {
+    this->table = new TruthTable(table);
+}
+
+BooleanFunction::BooleanFunction(const bool constValue) : table(nullptr) {
+    this->constValue = new bool(constValue);
+}
+
+BooleanFunction::BooleanFunction(const BooleanFunction &rhs) {
+    init(rhs);
+}
+
+BooleanFunction &BooleanFunction::operator=(const BooleanFunction &rhs) {
+    if (this != &rhs) {
+        destroy();
+        init(rhs);
+    }
+    return *this;
+}
+
+BooleanFunction::~BooleanFunction() {
+    destroy();
+}
+
+void BooleanFunction::init(const BooleanFunction &rhs) {
+    this->constValue = rhs.constValue == nullptr ? nullptr : new bool(*rhs.constValue);
+    this->table = rhs.table == nullptr ? nullptr : new TruthTable(*rhs.table);
+}
+
+void BooleanFunction::destroy() {
+    if (constValue != nullptr) {
+        delete constValue;
+        constValue = nullptr;
+    }
+
+    if (table != nullptr) {
+        delete table;
+        table = nullptr;
+    }
+}
+
+bool BooleanFunction::hasTruthTable() const {
+    return table != nullptr;
+}
+
+TruthTable &BooleanFunction::getTruthTable() {
+    if (hasTruthTable()) {
+        return *table;
+    }
+
+    throw IllegalStateException("Cannot get the truth table of a constant value Boolean function.");
+}
+
+const TruthTable &BooleanFunction::getTruthTable() const {
+    if (hasTruthTable()) {
+        return *table;
+    }
+
+    throw IllegalStateException("Cannot get the truth table of a constant value Boolean function.");
+}
+
+bool BooleanFunction::isConstant() const {
+    return constValue != nullptr;
+}
+
+bool BooleanFunction::getConstantValue() const {
+    if (isConstant()) {
+        return *constValue;
+    }
+
+    throw IllegalStateException("Cannot get the constant value of a non-constant Boolean function.");
+}
+
+bool &BooleanFunction::getConstantValue() {
+    if (isConstant()) {
+        return *constValue;
+    }
+
+    throw IllegalStateException("Cannot get the constant value of a non-constant Boolean function.");
 }
 }

@@ -25,22 +25,29 @@
 namespace Logic {
 class BooleanFunction {
 public:
-    BooleanFunction(const TruthTable &table) : table(table) {
-    }
+    BooleanFunction(const TruthTable &table);
+    BooleanFunction(const bool constValue);
+    BooleanFunction(const BooleanFunction &rhs);
+    ~BooleanFunction();
+    BooleanFunction &operator=(const BooleanFunction &rhs);
 
-    TruthTable &getTruthTable() {
-        return table;
-    }
+    bool hasTruthTable() const;
+    TruthTable &getTruthTable();
+    const TruthTable &getTruthTable() const;
 
-    const TruthTable &getTruthTable() const {
-        return table;
-    }
+    bool isConstant() const;
+    bool &getConstantValue();
+    bool getConstantValue() const;
 
     BooleanFunction operate(UnaryOperator<bool> &_operator) const;
     BooleanFunction operate(BinaryOperator<bool> &_operator, BooleanFunction &other) const;
 
 private:
-    TruthTable table;
+    TruthTable *table;
+    bool *constValue;
+
+    void init(const BooleanFunction &rhs);
+    void destroy();
 
     TruthTableBuilder combineTables(BinaryOperator<bool> &_operator, BooleanFunction &other) const;
     static TruthTable combineColumnsWithSameVariables(const TruthTableBuilder &rawBuilder);
