@@ -56,6 +56,8 @@ static string getInfixTokensRegex() {
         tokens.push_back("[\\(]");
         tokens.push_back("[\\)]");
         tokens.push_back("[\\$a-zA-Z]+");
+        tokens.push_back("[1]");
+        tokens.push_back("[0]");
         result = "[\\s]*(" + // Optional leading spaces
                  join(tokens, "|") + // actual token regex
                  ")[\\s]*"; // optional trailing spaces
@@ -148,7 +150,7 @@ static vector<string> getPostfixTokens(const string &function) {
             operatorStack.push(token);
         } else {
             // Not ")" or "(", and not matching operator regexes, but still in the list of infix tokens
-            // => must be a variable name
+            // => must be a variable name or a constant
             postfixTokens.push_back(token);
         }
     }
@@ -228,10 +230,14 @@ BooleanFunction BooleanFunctionParser::parse(const string &function, std::functi
                 const BooleanFunction &function = lookupFunction(lookupFunctionName);
                 accumulator.push(function);
             } else {
-                BooleanFunction function(TruthTable({ token }));
-                function.getTruthTable()[0] = false;
-                function.getTruthTable()[1] = true;
-                accumulator.push(function);
+                if (token == "0" || token == "1") {
+                    accumulator.push(BooleanFunction(token == "1"));
+                } else {
+                    BooleanFunction function(TruthTable({ token }));
+                    function.getTruthTable()[0] = false;
+                    function.getTruthTable()[1] = true;
+                    accumulator.push(function);
+                }
             }
         }
     }
