@@ -48,6 +48,7 @@ static T topAndPop(stack<T> &_stack) {
 }
 
 namespace Logic {
+static const string VARIABLE_REGEX = "[\\$a-zA-Z]+";
 static string getInfixTokensRegex() {
     static string result;
     unique_lock<mutex> lock(infixTokenRegexMutex);
@@ -55,7 +56,7 @@ static string getInfixTokensRegex() {
         vector<string> tokens = OPERATOR_REGEXES;
         tokens.push_back("[\\(]");
         tokens.push_back("[\\)]");
-        tokens.push_back("[\\$a-zA-Z]+");
+        tokens.push_back(VARIABLE_REGEX);
         tokens.push_back("[1]");
         tokens.push_back("[0]");
         result = "[\\s]*(" + // Optional leading spaces
@@ -97,6 +98,7 @@ bool BooleanFunctionAccumulator::canBePopped() {
     return _stack.size() == 1;
 }
 
+// This will wrap even single variable names for easier application of unary operators
 static vector<string> getInfixTokens(const string &function) {
     regex tokensRegex(getInfixTokensRegex());
     smatch sm;
@@ -106,7 +108,15 @@ static vector<string> getInfixTokens(const string &function) {
     string substring;
     while (i < function.length() && regex_search((substring = function.substr(i, string::npos)), sm, tokensRegex, regex_constants::match_continuous)) {
         // Index 1 => The first group in the regex
-        tokens.push_back(sm[1]);
+        string token = sm[1];
+        if (regex_match(token, regex(VARIABLE_REGEX))) {
+            // Surround by parenthesis, so that the unary operators are properly applied
+            tokens.push_back("(");
+            tokens.push_back(token);
+            tokens.push_back(")");
+        } else {
+            tokens.push_back(token);
+        }
         i += (uint64_t) sm.position(1) + (uint64_t) sm[1].length();
     }
     if (i != function.length()) {
@@ -117,6 +127,7 @@ static vector<string> getInfixTokens(const string &function) {
 }
 
 static vector<string> getPostfixTokens(const string &function) {
+    // Variables have parenthesis around them always, so that unary operators can be properly applied
     vector<string> infixTokens = getInfixTokens(function);
     stack<string> operatorStack;
     vector<string> postfixTokens;
