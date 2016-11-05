@@ -248,8 +248,14 @@ BooleanFunction BooleanFunctionParser::parse(const string &function, std::functi
     const vector<pair<string, bool>> conditions = parseConditions(trim(function.substr(indexOfConditionSpecifier + 1, string::npos)));
     TruthTableCondition truthTableCondition = parsed.getTruthTable().conditionBuilder();
     for (const pair<string, bool> &condition : conditions) {
-        truthTableCondition.when(condition.first, condition.second);
+        truthTableCondition.addCondition(condition.first, condition.second);
     }
-    return BooleanFunction(truthTableCondition.then());
+    truthTableCondition.process();
+
+    if (truthTableCondition.hasCollapsedToConstant()) {
+        return BooleanFunction(truthTableCondition.getConstant());
+    } else {
+        return BooleanFunction(truthTableCondition.getTruthTable());
+    }
 }
 }

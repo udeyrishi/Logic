@@ -175,15 +175,23 @@ namespace Logic {
 
 class TruthTableCondition {
 public:
-    void when(const string &variable, const bool value);
-    TruthTable then();
+    TruthTableCondition(const TruthTableCondition &rhs);
+    ~TruthTableCondition();
+    TruthTableCondition &operator=(const TruthTableCondition &rhs);
+
+    void addCondition(const string &variable, const bool value);
+    void process();
+    bool hasCollapsedToConstant() const;
+    bool getConstant() const;
+    TruthTable getTruthTable() const;
 private:
-    TruthTableCondition(const TruthTable &table) : table(table) {
-    }
+    TruthTableCondition(TruthTable *table);
 
     friend class TruthTable;
 
-    const TruthTable &table;
+    TruthTableBuilder *builder;
+    // TruthTableCondition does NOT own table
+    TruthTable *table;
     unordered_map<TruthTableVariablesUInt, bool> conditions;
 };
 }

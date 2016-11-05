@@ -234,9 +234,11 @@ SCENARIO("A TruthTable stores the variable and data properly", "[TruthTable, Tru
                 table[7] = true;
 
                 TruthTableCondition condition = table.conditionBuilder();
-                condition.when("a", true);
-                condition.when("ball", true);
-                TruthTable result = condition.then();
+                condition.addCondition("a", true);
+                condition.addCondition("ball", true);
+                condition.process();
+                REQUIRE(!condition.hasCollapsedToConstant());
+                TruthTable result = condition.getTruthTable();
 
                 REQUIRE(result.size() == 2);
                 REQUIRE(result.getVariables().size() == 1);
@@ -248,16 +250,18 @@ SCENARIO("A TruthTable stores the variable and data properly", "[TruthTable, Tru
 
         WHEN("You apply a condition on a variable that does not exist") {
             THEN("invalid_argument exception is thrown") {
-                CHECK_THROWS_AS({ table.conditionBuilder().when("b", true); }, invalid_argument);
+                CHECK_THROWS_AS({ table.conditionBuilder().addCondition("b", true); }, invalid_argument);
             }
         }
 
         WHEN("You apply a condition on a variable multiple times") {
             THEN("The values overwrite, and the last one is kept") {
                 TruthTableCondition condition = table.conditionBuilder();
-                condition.when("a", true);
-                condition.when("a", false);
-                TruthTable result = condition.then();
+                condition.addCondition("a", true);
+                condition.addCondition("a", false);
+                condition.process();
+                REQUIRE(!condition.hasCollapsedToConstant());
+                TruthTable result = condition.getTruthTable();
                 REQUIRE(result.size() == 4);
                 REQUIRE(result.getVariables().size() == 2);
                 REQUIRE(result.getVariables()[0] == "ball");
@@ -270,12 +274,34 @@ SCENARIO("A TruthTable stores the variable and data properly", "[TruthTable, Tru
         }
 
         WHEN("You apply a condition to all the variables") {
-            THEN("IllegalTruthTableException is thrown when creating the resulting table") {
+            THEN("IllegalStateException is thrown when creating the resulting table") {
                 TruthTableCondition condition = table.conditionBuilder();
-                condition.when("a", true);
-                condition.when("ball", true);
-                condition.when("cat", false);
-                CHECK_THROWS_AS({ condition.then(); }, IllegalTruthTableException);
+                condition.addCondition("a", true);
+                condition.addCondition("ball", true);
+                condition.addCondition("cat", false);
+                condition.process();
+
+                REQUIRE(condition.hasCollapsedToConstant());
+                REQUIRE(!condition.getConstant());
+                CHECK_THROWS_AS({ condition.getTruthTable(); }, IllegalStateException);
+            }
+        }
+
+        WHEN("You apply a condition after processing previously applied conditions") {
+            TruthTableCondition condition = table.conditionBuilder();
+            table[1] = true;
+            condition.addCondition("a", true);
+            condition.addCondition("ball", false);
+            condition.process();
+            REQUIRE(!condition.hasCollapsedToConstant());
+            condition.addCondition("cat", false);
+            REQUIRE(!condition.hasCollapsedToConstant());
+
+            THEN("The new condition is added after a new process call") {
+                condition.process();
+                REQUIRE(condition.hasCollapsedToConstant());
+                CHECK_THROWS_AS({ condition.getTruthTable(); }, IllegalStateException);
+                REQUIRE(condition.getConstant());
             }
         }
     }

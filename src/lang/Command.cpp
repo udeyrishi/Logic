@@ -44,7 +44,7 @@ bool CreateBooleanFunctionCommand::execute(const string &args, Runtime &runtime,
 bool PrintBooleanFunctionCommand::execute(const string &expression, Runtime &runtime, ostream &out) {
     out << BooleanFunctionParser().parse(expression, [&](const string &functionName) -> const BooleanFunction& {
         return runtime.get(functionName);
-    });
+    }) << endl;
     return true;
 }
 

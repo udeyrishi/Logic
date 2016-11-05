@@ -18,6 +18,7 @@
 #include <core/Exceptions.hpp>
 #include <unordered_map>
 #include <unordered_set>
+#include <iostream>
 
 using namespace std;
 
@@ -170,7 +171,7 @@ BooleanFunction BooleanFunction::operate(BinaryOperator<bool> &_operator, Boolea
 
 ostream &operator<<(ostream &os, const BooleanFunction &function) {
     if (function.isConstant()) {
-        os << (function.getConstantValue() ? "true" : "false");
+        os << (function.getConstantValue() ? 1 : 0);
     } else {
         os << function.getTruthTable();
     }

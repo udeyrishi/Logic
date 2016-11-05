@@ -142,16 +142,47 @@ void TruthTable::validateIndex(const TruthTableUInt index) const {
 }
 
 TruthTableCondition TruthTable::conditionBuilder() {
-    return TruthTableCondition(*this);
+    return TruthTableCondition(this);
 }
 
-void TruthTableCondition::when(const string &variable, const bool value) {
-    const auto &hit = find(table.getVariables().begin(), table.getVariables().end(), variable);
-    if (hit == table.getVariables().end()) {
+TruthTableCondition::TruthTableCondition(TruthTable *table) : builder(nullptr), table(table) {
+}
+
+TruthTableCondition::TruthTableCondition(const TruthTableCondition &rhs) : builder(nullptr), table(rhs.table) {
+    if (rhs.builder != nullptr) {
+        this->builder = new TruthTableBuilder(*rhs.builder);
+    }
+}
+
+TruthTableCondition::~TruthTableCondition() {
+    if (builder != nullptr) {
+        delete builder;
+    }
+}
+
+TruthTableCondition &TruthTableCondition::operator=(const TruthTableCondition &rhs) {
+    if (this != &rhs) {
+        if (builder != nullptr) {
+            delete builder;
+            builder = nullptr;
+        }
+        if (rhs.builder != nullptr) {
+            this->builder = new TruthTableBuilder(*rhs.builder);
+        }
+
+        table = rhs.table;
+    }
+
+    return *this;
+}
+
+void TruthTableCondition::addCondition(const string &variable, const bool value) {
+    const auto &hit = find(table->getVariables().begin(), table->getVariables().end(), variable);
+    if (hit == table->getVariables().end()) {
         throw invalid_argument("variable not found in the truth table: " + variable);
     }
 
-    TruthTableVariablesUInt position = hit - table.getVariables().begin();
+    TruthTableVariablesUInt position = hit - table->getVariables().begin();
     if (conditions.find(position) != conditions.end()) {
         conditions.erase(position);
     }
@@ -159,10 +190,16 @@ void TruthTableCondition::when(const string &variable, const bool value) {
     conditions.insert(make_pair(position, value));
 }
 
-TruthTable TruthTableCondition::then() {
+void TruthTableCondition::process() {
+    // reset results from last process() call, if any
+    if (builder != nullptr) {
+        delete builder;
+        builder = nullptr;
+    }
+
     TruthTableUInt newTable = 0;
-    TruthTableBuilder builder;
-    for (TruthTableUInt i = 0; i < table.size(); ++i) {
+    builder = new TruthTableBuilder();
+    for (TruthTableUInt i = 0; i < table->size(); ++i) {
         bool allConditionsMet = true;
         for (const auto &condition : conditions) {
             if ((bool) ((i >> condition.first) & 1) != condition.second) {
@@ -172,25 +209,41 @@ TruthTable TruthTableCondition::then() {
         }
 
         if (allConditionsMet) {
-            builder.set(newTable++, table[i]);
+            builder->set(newTable++, (*table)[i]);
         }
     }
 
     vector<string> newVariables;
-    for (TruthTableVariablesUInt i = 0; i < table.getVariables().size(); ++i) {
+    for (TruthTableVariablesUInt i = 0; i < table->getVariables().size(); ++i) {
         if (conditions.find(i) == conditions.end()) {
-            newVariables.push_back(table.getVariables()[i]);
+            newVariables.push_back(table->getVariables()[i]);
         }
     }
-    builder.setVariables(newVariables);
-    try {
-        return builder.build();
-    } catch (const IllegalTruthTableException &ex) {
-        throw IllegalTruthTableException(
-            string("The result is the constant ") +
-            string(builder.getValue(0) ? "'true'" : "'false'") +
-            string(" that cannot be stored in a truth table."));
+    builder->setVariables(newVariables);
+}
+
+bool TruthTableCondition::hasCollapsedToConstant() const {
+    if (builder == nullptr) {
+        throw IllegalStateException("Cannot assess the TruthTableCondition's state before a process() call.");
     }
+
+    return builder->tentativeSize() == 1;
+}
+
+bool TruthTableCondition::getConstant() const {
+    if (hasCollapsedToConstant()) {
+        return builder->getValue(0);
+    }
+
+    throw IllegalStateException("The result after applying the conditions is not a constant value.");
+}
+
+TruthTable TruthTableCondition::getTruthTable() const {
+    if (hasCollapsedToConstant()) {
+        throw IllegalStateException("The result after applying the conditions is a constant value.");
+    }
+
+    return builder->build();
 }
 
 TruthTable TruthTableBuilder::build() const {
@@ -347,7 +400,10 @@ ostream &operator<<(ostream &os, const TruthTable &table) {
                    << (TruthTable::getVariableValueInLine(numVariables - j - 1, i) ? '1' : '0')
                    << (string(getRightPadding(cellWidth, 1), ' '));
             }
-            os << "| " << table[i] << endl;
+            os << "| " << table[i];
+            if (i < table.size() - 1) {
+                os << endl;
+            }
         }
     }
 
