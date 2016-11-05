@@ -70,6 +70,30 @@ The above will define two Boolean functions `x` and `y` which are functions of `
 | 1 | 1 | 1 | 1
 ```
 
+Besides variables, you can use the constants `1` and `0` in the expressions as well, such as:
+
+```
+let foo = 1;
+p !$z | $foo;
+```
+
+This will output:
+
+```
+| c | b | a |
+---------------
+| 0 | 0 | 0 | 1
+| 0 | 0 | 1 | 1
+| 0 | 1 | 0 | 1
+| 0 | 1 | 1 | 1
+| 1 | 0 | 0 | 1
+| 1 | 0 | 1 | 1
+| 1 | 1 | 0 | 1
+| 1 | 1 | 1 | 1
+```
+
+`$foo` here is a special constant value Boolean function.
+
 ###Commands
 The first word in every line of Logic code is a command. Everything that follows is passed to that command as arguments. Different commands expect different number of arguments.
 
@@ -149,6 +173,8 @@ Here, `x` is the function `(a & b) | c`, when `b` is true and `a` is false. That
 | 1 | 0 | 1
 | 1 | 1 | 1
 ```
+
+Note that after applying the conditions, you could be left with a constant value Boolean function. The output in that case will be `0` or `1`, as was shown in the introductary section above.
 
 You can use the `:` token in a `let` command or in a `print` command. You can use it exactly once towards the end of the function definition.
 
