@@ -26,31 +26,44 @@ using namespace std;
 static const regex CREATE_ARGS_REGEX("\\s*([a-zA-Z]+)\\s*[=]\\s*(.+)\\s*");
 
 namespace Logic {
+BooleanFunction parse(const string &expression, const Runtime &runtime) {
+    return BooleanFunctionParser().parse(expression, [&](const string &functionName) -> const BooleanFunction& {
+        return runtime.get(functionName);
+    });
+}
+
 bool CreateBooleanFunctionCommand::execute(const string &args, Runtime &runtime, ostream &out) {
     UNUSED(out);
+
     smatch sm;
     if (regex_match(args, sm, CREATE_ARGS_REGEX, regex_constants::match_continuous)) {
         string variableName = sm[1];
-        BooleanFunctionParser functionParser;
-        runtime.save(variableName, functionParser.parse(sm[2], [&](const string &functionName) -> const BooleanFunction& {
-            return runtime.get(functionName);
-        }));
+        string expression = sm[2];
+        runtime.save(variableName, parse(expression, runtime));
         return true;
-    } else {
-        throw BadCommandArgumentsException("Unknown args to command 'let': " + args);
     }
+
+    throw BadCommandArgumentsException("Unknown args to command 'let': " + args);
 }
 
 bool PrintBooleanFunctionCommand::execute(const string &expression, Runtime &runtime, ostream &out) {
-    out << BooleanFunctionParser().parse(expression, [&](const string &functionName) -> const BooleanFunction& {
-        return runtime.get(functionName);
-    }) << endl;
+    out << parse(expression, runtime) << endl;
     return true;
 }
 
 bool DeleteBooleanFunctionCommand::execute(const string &functionName, Runtime &runtime, ostream &out) {
     UNUSED(out);
     runtime.erase(functionName);
+    return true;
+}
+
+bool PrintMaxtermsCommand::execute(const string &expression, Runtime &runtime, ostream &out) {
+    out << join(parse(expression, runtime).getTruthTable().getMaxterms(), ", ") << endl;
+    return true;
+}
+
+bool PrintMintermsCommand::execute(const string &expression, Runtime &runtime, ostream &out) {
+    out << join(parse(expression, runtime).getTruthTable().getMinterms(), ", ") << endl;
     return true;
 }
 
@@ -72,6 +85,10 @@ Command *getCommand(const string &command) {
         return new DeleteBooleanFunctionCommand();
     } else if (contains(QUIT_COMMAND, command)) {
         return new QuitCommand();
+    } else if (contains(MAXTERMS_COMMAND, command)) {
+        return new PrintMaxtermsCommand();
+    } else if (contains(MINTERMS_COMMAND, command)) {
+        return new PrintMintermsCommand();
     }
 
     throw UnknownCommandException("Unknown command: " + command);

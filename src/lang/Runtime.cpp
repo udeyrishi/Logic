@@ -37,6 +37,14 @@ BooleanFunction &Runtime::get(const string &variableName) {
     return found->second;
 }
 
+const BooleanFunction &Runtime::get(const string &variableName) const {
+    const auto &found = workspace.find(variableName);
+    if (found == workspace.end()) {
+        throw BooleanFunctionNotFoundException("Boolean Function not found in the current workspace: " + variableName);
+    }
+    return found->second;
+}
+
 bool Runtime::contains(const string &variableName) const {
     return workspace.find(variableName) != workspace.end();
 }

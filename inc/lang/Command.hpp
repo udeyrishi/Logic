@@ -47,6 +47,16 @@ class DeleteBooleanFunctionCommand : public Command {
     virtual bool execute(const string &functionName, Runtime &runtime, ostream &out);
 };
 
+static const vector<string> MINTERMS_COMMAND({"minterms", "min"});
+class PrintMintermsCommand : public Command {
+    virtual bool execute(const string &expression, Runtime &runtime, ostream &out);
+};
+
+static const vector<string> MAXTERMS_COMMAND({"maxterms", "max"});
+class PrintMaxtermsCommand : public Command {
+    virtual bool execute(const string &expression, Runtime &runtime, ostream &out);
+};
+
 static const vector<string> QUIT_COMMAND({"quit", "q"});
 class QuitCommand : public Command {
     virtual bool execute(const string &args, Runtime &runtime, ostream &out);

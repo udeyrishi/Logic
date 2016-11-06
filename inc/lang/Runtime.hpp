@@ -29,6 +29,7 @@ class Runtime
 public:
     void save(const string &variableName, const BooleanFunction &function);
     BooleanFunction &get(const string &variableName);
+    const BooleanFunction &get(const string &variableName) const;
     bool contains(const string &variableName) const;
     void erase(const string &variableName);
 private:
