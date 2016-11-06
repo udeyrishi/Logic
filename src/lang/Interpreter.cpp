@@ -43,7 +43,7 @@ string Interpreter::nextLine(istream &in) {
     stringstream input;
     bool commentOngoing = false;
     char c;
-    while ((c = (char) in.get())) {
+    while ((c = (char) in.get()) != char_traits<char>::eof()) {
         if (c == '\r') {
             // Leftover from a previous \n in Windows
             continue;
