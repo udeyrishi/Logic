@@ -75,4 +75,16 @@ namespace Logic {
         }
         return parts;
     }
+
+    string join(const vector<string> &vec, const string &delimiter) {
+        string joined;
+        for (uint64_t i = 0; i < vec.size(); ++i) {
+            if (i == vec.size() - 1) {
+                joined += vec[i];
+            } else {
+                joined += vec[i] + delimiter;
+            }
+        }
+        return joined;
+    }
 }

@@ -115,7 +115,7 @@ TruthTable BooleanFunction::combineColumnsWithSameVariables(const TruthTableBuil
     return builder.build();
 }
 
-TruthTableBuilder BooleanFunction::combineTables(BinaryOperator<bool> &_operator, BooleanFunction &other) const {
+TruthTableBuilder BooleanFunction::combineTables(BinaryOperator<bool> &_operator, const BooleanFunction &other) const {
     // By convention, this function's variables will have lower significance
     vector<string> variables = table->getVariables();
     variables.insert(variables.end(), other.getTruthTable().getVariables().begin(), other.getTruthTable().getVariables().end());
@@ -145,7 +145,7 @@ BooleanFunction BooleanFunction::operate(UnaryOperator<bool> &_operator) const {
     return result;
 }
 
-BooleanFunction BooleanFunction::operate(BinaryOperator<bool> &_operator, BooleanFunction &other) const {
+BooleanFunction BooleanFunction::operate(BinaryOperator<bool> &_operator, const BooleanFunction &other) const {
     if (hasTruthTable() && other.hasTruthTable()) {
         // Combining two regular Boolean functions
         return BooleanFunction(combineColumnsWithSameVariables(combineTables(_operator, other)));
@@ -167,6 +167,14 @@ BooleanFunction BooleanFunction::operate(BinaryOperator<bool> &_operator, Boolea
         }
     }
     return BooleanFunction(clone);
+}
+
+BooleanFunction BooleanFunction::operate(UnaryOperator<BooleanFunction> &_operator) const {
+    return _operator(*this);
+}
+
+BooleanFunction BooleanFunction::operate(BinaryOperator<BooleanFunction> &_operator, const BooleanFunction &other) const {
+    return _operator(*this, other);
 }
 
 ostream &operator<<(ostream &os, const BooleanFunction &function) {

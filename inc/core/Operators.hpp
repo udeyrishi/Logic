@@ -19,19 +19,23 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <regex>
 
 using namespace std;
 
 namespace Logic {
 
-static const string NOT_SYMBOL("!");
-static const string AND_SYMBOL("&");
-static const string OR_SYMBOL("|");
-static const string XOR_SYMBOL("^");
-static const vector<string> OPERATOR_REGEXES({ "["   + NOT_SYMBOL + "]",
-                                          "["   + AND_SYMBOL + "]",
-                                          "[\\"   + OR_SYMBOL  + "]",
-                                          "[\\" + XOR_SYMBOL + "]"});
+static const string NOT_REGEX("[!]");
+static const string AND_REGEX("[&]");
+static const string OR_REGEX("[\\|]");
+static const string XOR_REGEX("[\\^]");
+static const string EQUALS_REGEX("[=]{2}");
+static const vector<string> OPERATOR_REGEXES({
+                                          NOT_REGEX,
+                                          AND_REGEX,
+                                          OR_REGEX,
+                                          XOR_REGEX,
+                                          EQUALS_REGEX });
 
 template <typename T>
 class UnaryOperator {
@@ -81,13 +85,21 @@ public:
     }
 };
 
+template <typename T>
+class Equals : public BinaryOperator<T> {
+public:
+    virtual T operator()(const T first, const T second) {
+        return first == second;
+    }
+};
+
 bool isKnownUnaryOperator(const string &_operator);
 bool isKnownBinaryOperator(const string &_operator);
 
 // Need to leave this implementation in the header, because else the linker freaks out
 template <typename T>
 UnaryOperator<T> *createUnaryOperatorWithSymbol(const string &_operator) {
-    if (_operator == NOT_SYMBOL) {
+    if (regex_match(_operator, regex(NOT_REGEX))) {
         return new Not<T>();
     }
     throw invalid_argument("Unknown operator: " + _operator);
@@ -96,12 +108,14 @@ UnaryOperator<T> *createUnaryOperatorWithSymbol(const string &_operator) {
 // Need to leave this implementation in the header, because else the linker freaks out
 template <typename T>
 BinaryOperator<T> *createBinaryOperatorWithSymbol(const string &_operator) {
-    if (_operator == AND_SYMBOL) {
+    if (regex_match(_operator, regex(AND_REGEX))) {
         return new And<T>();
-    } else if (_operator == OR_SYMBOL) {
+    } else if (regex_match(_operator, regex(OR_REGEX)))  {
         return new Or<T>();
-    } else if (_operator == XOR_SYMBOL) {
+    } else if (regex_match(_operator, regex(XOR_REGEX)))  {
         return new Xor<T>();
+    } else if (regex_match(_operator, regex(EQUALS_REGEX)))  {
+        return new Equals<T>();
     }
     throw invalid_argument("Unknown operator: " + _operator);
 }

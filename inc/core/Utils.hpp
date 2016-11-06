@@ -29,6 +29,7 @@ namespace Logic {
     string trim(const string &str);
     vector<string> split(string str, const char delim);
     vector<string> split(string str, const string &delim);
+    string join(const vector<string> &vec, const string &delimiter);
 
     template <typename TCollection, typename TValue>
     bool contains(TCollection collection, TValue item) {

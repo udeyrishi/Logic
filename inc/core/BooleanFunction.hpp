@@ -39,8 +39,14 @@ public:
     bool &getConstantValue();
     bool getConstantValue() const;
 
+    // Operates on all the values in table individually, if there's a table
+    // Or operates on the constant value if a constant-value Boolean function
     BooleanFunction operate(UnaryOperator<bool> &_operator) const;
-    BooleanFunction operate(BinaryOperator<bool> &_operator, BooleanFunction &other) const;
+    BooleanFunction operate(BinaryOperator<bool> &_operator, const BooleanFunction &other) const;
+
+    // May not operate on the individual values, as the logic maybe more complicated
+    BooleanFunction operate(UnaryOperator<BooleanFunction> &_operator) const;
+    BooleanFunction operate(BinaryOperator<BooleanFunction> &_operator, const BooleanFunction &other) const;
 
 private:
     TruthTable *table;
@@ -49,7 +55,7 @@ private:
     void init(const BooleanFunction &rhs);
     void destroy();
 
-    TruthTableBuilder combineTables(BinaryOperator<bool> &_operator, BooleanFunction &other) const;
+    TruthTableBuilder combineTables(BinaryOperator<bool> &_operator, const BooleanFunction &other) const;
     static TruthTable combineColumnsWithSameVariables(const TruthTableBuilder &rawBuilder);
 };
 

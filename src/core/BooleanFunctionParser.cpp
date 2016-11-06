@@ -28,18 +28,6 @@ using namespace std;
 
 static mutex infixTokenRegexMutex;
 
-static string join(const vector<string> &vec, const string &delimiter) {
-    string joined;
-    for (uint64_t i = 0; i < vec.size(); ++i) {
-        if (i == vec.size() - 1) {
-            joined += vec[i];
-        } else {
-            joined += vec[i] + delimiter;
-        }
-    }
-    return joined;
-}
-
 template <typename T>
 static T topAndPop(stack<T> &_stack) {
     T top = _stack.top();
@@ -70,14 +58,16 @@ void BooleanFunctionAccumulator::push(const BooleanFunction &function) {
     _stack.push(function);
 }
 
-void BooleanFunctionAccumulator::push(UnaryOperator<bool> &_operator) {
+template <typename T>
+void BooleanFunctionAccumulator::push(UnaryOperator<T> &_operator) {
     if (_stack.empty()) {
         throw IllegalStateException("Cannot push a unary operator on an empty stack.");
     }
     _stack.push(topAndPop(_stack).operate(_operator));
 }
 
-void BooleanFunctionAccumulator::push(BinaryOperator<bool> &_operator) {
+template <typename T>
+void BooleanFunctionAccumulator::push(BinaryOperator<T> &_operator) {
     if (_stack.size() < 2) {
         throw IllegalStateException("Cannot push a binary operator on an stack of size less than 2");
     }
@@ -227,9 +217,17 @@ BooleanFunction BooleanFunctionParser::parse(const string &function, std::functi
             accumulator.push(*op);
             delete op;
         } else if (isKnownBinaryOperator(token)) {
-            BinaryOperator<bool> *op = createBinaryOperatorWithSymbol<bool>(token);
-            accumulator.push(*op);
-            delete op;
+            if (regex_match(token, regex(EQUALS_REGEX))) {
+                // This is not a bool-level operator. This a BooleanFunction level operator, because
+                // the result is a constant value Boolean Function
+                Equals<BooleanFunction> equalsOperator;
+                accumulator.push(equalsOperator);
+            } else {
+                BinaryOperator<bool> *op = createBinaryOperatorWithSymbol<bool>(token);
+                accumulator.push(*op);
+                delete op;
+            }
+
         } else {
             // token == variable
             if (token.c_str()[0] == '$') {
