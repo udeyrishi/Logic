@@ -97,6 +97,9 @@ public:
 
     TruthTableCondition conditionBuilder();
 
+    vector<TruthTableUInt> getMinterms();
+    vector<TruthTableUInt> getMaxterms();
+
     static bool getVariableValueInLine(TruthTableVariablesUInt columnNumber, TruthTableUInt lineIndex);
 private:
     vector<string> variables;

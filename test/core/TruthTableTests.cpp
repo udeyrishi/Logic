@@ -304,6 +304,29 @@ SCENARIO("A TruthTable stores the variable and data properly", "[TruthTable, Tru
                 REQUIRE(condition.getConstant());
             }
         }
+
+        WHEN("You change some values in the truthtable") {
+            table[0] = true;
+            table[4] = true;
+
+            THEN("The table returns the correct minterms") {
+                vector<TruthTableUInt> minterms = table.getMinterms();
+                REQUIRE(minterms.size() == 2);
+                REQUIRE(minterms[0] == 0);
+                REQUIRE(minterms[1] == 4);
+            }
+
+            THEN("The table returns the correct maxterms") {
+                vector<TruthTableUInt> maxterms = table.getMaxterms();
+                REQUIRE(maxterms.size() == 6);
+                REQUIRE(maxterms[0] == 1);
+                REQUIRE(maxterms[1] == 2);
+                REQUIRE(maxterms[2] == 3);
+                REQUIRE(maxterms[3] == 5);
+                REQUIRE(maxterms[4] == 6);
+                REQUIRE(maxterms[5] == 7);
+            }
+        }
     }
 
     WHEN("You try to create a truthtable with no variables") {
@@ -331,7 +354,7 @@ SCENARIO("A TruthTable stores the variable and data properly", "[TruthTable, Tru
     }
 }
 
-SCENARIO("A TruthTable equiality operator works properly", "[TruthTable]") {
+SCENARIO("A TruthTable equality operator works properly", "[TruthTable]") {
     GIVEN("A TruthTable") {
         TruthTable table({"x", "y"});
         table[3] = true;

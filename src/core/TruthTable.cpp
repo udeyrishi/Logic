@@ -130,6 +130,26 @@ bool TruthTable::operator[](const TruthTableUInt index) const {
     return values[index];
 }
 
+vector<TruthTableUInt> TruthTable::getMinterms() {
+    vector<TruthTableUInt> minterms;
+    for (TruthTableUInt i = 0; i < size(); ++i) {
+        if ((*this)[i]) {
+             minterms.push_back(i);
+        }
+    }
+    return minterms;
+}
+
+vector<TruthTableUInt> TruthTable::getMaxterms() {
+    vector<TruthTableUInt> maxterms;
+    for (TruthTableUInt i = 0; i < size(); ++i) {
+        if (!(*this)[i]) {
+             maxterms.push_back(i);
+        }
+    }
+    return maxterms;
+}
+
 bool operator==(const TruthTable &left, const TruthTable &right) {
     return left.getVariables() == right.getVariables() &&
            left.values == right.values;
