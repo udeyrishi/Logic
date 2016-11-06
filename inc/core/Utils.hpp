@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 using namespace std;
 // For explicitly removing -Wunused-parameter
@@ -29,7 +30,18 @@ namespace Logic {
     string trim(const string &str);
     vector<string> split(string str, const char delim);
     vector<string> split(string str, const string &delim);
-    string join(const vector<string> &vec, const string &delimiter);
+
+    template <typename T>
+    string join(const vector<T> &vec, const string &delimiter) {
+        stringstream joined;
+        for (uint64_t i = 0; i < vec.size(); ++i) {
+            joined << vec[i];
+            if (i < vec.size() - 1) {
+                joined << delimiter;
+            }
+        }
+        return joined.str();
+    }
 
     template <typename TCollection, typename TValue>
     bool contains(TCollection collection, TValue item) {

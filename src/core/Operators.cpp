@@ -26,7 +26,7 @@ bool isKnownUnaryOperator(const string &_operator) {
 }
 
 bool isKnownBinaryOperator(const string &_operator) {
-    regex binaryOperators(join({ AND_REGEX, OR_REGEX, XOR_REGEX, EQUALS_REGEX }, "|"));
+    regex binaryOperators(join<string>({ AND_REGEX, OR_REGEX, XOR_REGEX, EQUALS_REGEX }, "|"));
     return regex_match(_operator, binaryOperators);
 }
 }
