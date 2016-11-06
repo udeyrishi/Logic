@@ -26,6 +26,14 @@ using namespace std;
 static const regex CREATE_ARGS_REGEX("\\s*([a-zA-Z]+)\\s*[=]\\s*(.+)\\s*");
 
 namespace Logic {
+const vector<string> CreateBooleanFunctionCommand::SYMBOLS = {"let", "l"};
+const vector<string> PrintBooleanFunctionCommand::SYMBOLS= {"print", "p"};
+const vector<string> DeleteBooleanFunctionCommand::SYMBOLS = {"delete", "d"};
+const vector<string> PrintMintermsCommand::SYMBOLS = {"minterms", "min"};
+const vector<string> PrintMaxtermsCommand::SYMBOLS = {"maxterms", "max"};
+const vector<string> PrintVariablesCommand::SYMBOLS = {"variables", "v"};
+const vector<string> QuitCommand::SYMBOLS = {"quit", "q"};
+
 BooleanFunction parse(const string &expression, const Runtime &runtime) {
     return BooleanFunctionParser().parse(expression, [&](const string &functionName) -> const BooleanFunction& {
         return runtime.get(functionName);
@@ -82,19 +90,19 @@ bool QuitCommand::execute(const string &args, Runtime &runtime, ostream &out) {
 }
 
 Command *getCommand(const string &command) {
-    if (contains(CREATE_COMMAND, command)) {
+    if (contains(CreateBooleanFunctionCommand::SYMBOLS, command)) {
         return new CreateBooleanFunctionCommand();
-    } else if (contains(PRINT_COMMAND, command)) {
+    } else if (contains(PrintBooleanFunctionCommand::SYMBOLS, command)) {
         return new PrintBooleanFunctionCommand();
-    } else if (contains(DELETE_COMMAND, command)) {
+    } else if (contains(DeleteBooleanFunctionCommand::SYMBOLS, command)) {
         return new DeleteBooleanFunctionCommand();
-    } else if (contains(QUIT_COMMAND, command)) {
+    } else if (contains(QuitCommand::SYMBOLS, command)) {
         return new QuitCommand();
-    } else if (contains(MAXTERMS_COMMAND, command)) {
+    } else if (contains(PrintMaxtermsCommand::SYMBOLS, command)) {
         return new PrintMaxtermsCommand();
-    } else if (contains(MINTERMS_COMMAND, command)) {
+    } else if (contains(PrintMintermsCommand::SYMBOLS, command)) {
         return new PrintMintermsCommand();
-    } else if (contains(VARIABLES_COMMAND, command)) {
+    } else if (contains(PrintVariablesCommand::SYMBOLS, command)) {
         return new PrintVariablesCommand();
     }
 

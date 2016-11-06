@@ -30,41 +30,46 @@ public:
     }
 };
 
-static const vector<string> CREATE_COMMAND({"let", "l"});
 class CreateBooleanFunctionCommand : public Command  {
 public:
     virtual bool execute(const string &args, Runtime &runtime, ostream &out);
+    static const vector<string> SYMBOLS;
 };
 
-static const vector<string> PRINT_COMMAND({"print", "p"});
 class PrintBooleanFunctionCommand : public Command {
 public:
     virtual bool execute(const string &expression, Runtime &runtime, ostream &out);
+    static const vector<string> SYMBOLS;
 };
 
-static const vector<string> DELETE_COMMAND({"delete", "d"});
 class DeleteBooleanFunctionCommand : public Command {
+public:
     virtual bool execute(const string &functionName, Runtime &runtime, ostream &out);
+    static const vector<string> SYMBOLS;
 };
 
-static const vector<string> MINTERMS_COMMAND({"minterms", "min"});
 class PrintMintermsCommand : public Command {
+public:
     virtual bool execute(const string &expression, Runtime &runtime, ostream &out);
+    static const vector<string> SYMBOLS;
 };
 
-static const vector<string> MAXTERMS_COMMAND({"maxterms", "max"});
 class PrintMaxtermsCommand : public Command {
+public:
     virtual bool execute(const string &expression, Runtime &runtime, ostream &out);
+    static const vector<string> SYMBOLS;
 };
 
-static const vector<string> VARIABLES_COMMAND({"variables", "v"});
 class PrintVariablesCommand : public Command {
+public:
     virtual bool execute(const string &expression, Runtime &runtime, ostream &out);
+    static const vector<string> SYMBOLS;
 };
 
-static const vector<string> QUIT_COMMAND({"quit", "q"});
 class QuitCommand : public Command {
+public:
     virtual bool execute(const string &args, Runtime &runtime, ostream &out);
+    static const vector<string> SYMBOLS;
 };
 
 Command *getCommand(const string &command);
