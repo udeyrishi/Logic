@@ -67,6 +67,11 @@ bool PrintMintermsCommand::execute(const string &expression, Runtime &runtime, o
     return true;
 }
 
+bool PrintVariablesCommand::execute(const string &expression, Runtime &runtime, ostream &out) {
+    out << join(parse(expression, runtime).getTruthTable().getVariables(), ", ") << endl;
+    return true;
+}
+
 bool QuitCommand::execute(const string &args, Runtime &runtime, ostream &out) {
     UNUSED(out);
     UNUSED(runtime);
@@ -89,6 +94,8 @@ Command *getCommand(const string &command) {
         return new PrintMaxtermsCommand();
     } else if (contains(MINTERMS_COMMAND, command)) {
         return new PrintMintermsCommand();
+    } else if (contains(VARIABLES_COMMAND, command)) {
+        return new PrintVariablesCommand();
     }
 
     throw UnknownCommandException("Unknown command: " + command);

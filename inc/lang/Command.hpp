@@ -57,6 +57,11 @@ class PrintMaxtermsCommand : public Command {
     virtual bool execute(const string &expression, Runtime &runtime, ostream &out);
 };
 
+static const vector<string> VARIABLES_COMMAND({"variables", "v"});
+class PrintVariablesCommand : public Command {
+    virtual bool execute(const string &expression, Runtime &runtime, ostream &out);
+};
+
 static const vector<string> QUIT_COMMAND({"quit", "q"});
 class QuitCommand : public Command {
     virtual bool execute(const string &args, Runtime &runtime, ostream &out);
