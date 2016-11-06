@@ -15,47 +15,81 @@
 */
 
 #include <iostream>
+#include <string>
 #include <lang/Interpreter.hpp>
 #include <lang/Runtime.hpp>
 #include <fstream>
+#include <sstream>
 #include <exception>
+#include <stdlib.h>
 
 using namespace Logic;
 using namespace std;
 
-int main(int argc, char **argv) {
-    Runtime *runtime = nullptr;
-    Interpreter *interpreter = nullptr;
-    if (argc == 1) {
-        runtime = new Runtime();
-        interpreter = new Interpreter(*runtime, cin, cout, true);
+#define PRINT_USAGE_AND_EXIT() {        \
+    printUsage(argv[0]);                \
+    exit(-1);                           \
+}
 
-        interpreter->start();
-        while (true) {
-            try {
-                interpreter->run();
-                break;
-            } catch (const exception &ex) {
-                cerr << "ERROR: " << ex.what() << endl;
-            }
-        }
+void printUsage(const char *programName);
+void interpret(Interpreter &interpreter, const bool terminateOnFailure);
+
+int main(int argc, char **argv) {
+    Runtime runtime;
+
+    if (argc == 1) {
+        // Interactive
+        Interpreter interpreter(runtime, cin, cout, true);
+        interpret(interpreter, false);
+
     } else if (argc == 2) {
-        char* path = argv[1];
-        ifstream infile(path);
-        runtime = new Runtime();
-        interpreter = new Interpreter(*runtime, infile, cout);
-        interpreter->start();
+        string path = argv[1];
+        if (path == "-c" || path == "--code") {
+            // Can't use this as the file path, because this is the direct code option
+            PRINT_USAGE_AND_EXIT();
+        } else if (path == "-h" || path == "--help") {
+            printUsage(argv[0]);
+        } else {
+            ifstream codeFileStream(path);
+            Interpreter interpreter(runtime, codeFileStream, cout, false);
+            interpret(interpreter, true);
+        }
+    } else if (argc == 3) {
+        string option = argv[1];
+        if (option != "-c" && option != "--code") {
+            PRINT_USAGE_AND_EXIT();
+        }
+        // Run this code
+        stringstream codeStream;
+        codeStream << argv[2];
+        Interpreter interpreter(runtime, codeStream, cout, false);
+        interpret(interpreter, true);
+
+    } else {
+        PRINT_USAGE_AND_EXIT();
+    }
+
+    return 0;
+}
+
+void interpret(Interpreter &interpreter, const bool terminateOnFailure) {
+    interpreter.start();
+    do {
         try {
-            interpreter->run();
+            interpreter.run();
+            break;
         } catch (const exception &ex) {
             cerr << "ERROR: " << ex.what() << endl;
         }
-    } else {
-        cerr << "Usage to start shell: " << argv[0] << endl;
-        cerr << "Usage to read from file: " << argv[0] << " <path to file>" << endl;
-        return -1;
-    }
-    delete interpreter;
-    delete runtime;
-    return 0;
+    } while (!terminateOnFailure);
+}
+
+void printUsage(const char *programName) {
+    cerr << "Usage: " << endl;
+    cerr << "  " << programName << " [options]" << endl;
+    cerr << "    options:" << endl;
+    cerr << "      <no option>         : starts in interactive mode if no option is provided" << endl;
+    cerr << "      [filepath]          : executes the code in the text file located at <filepath>" << endl;
+    cerr << "      -c, --code [code]   : executes the code string passed as the command line arg itself" << endl;
+    cerr << "      -h, --help          : print this usage info" << endl;
 }
