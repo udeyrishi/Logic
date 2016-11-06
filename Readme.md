@@ -99,10 +99,13 @@ The first word in every line of Logic code is a command. Everything that follows
 
 The list of currently defined commands, their aliases in the parenthesis, and what they do:
 
-* `let` (`l`): Defines a new Boolean function in the current workspace, or overwrites an existing one with the same name. Expects 1 argument (everything that follows `let`).
-* `print` (`p`): Prints the truth table representing the Boolean function passed to it. It can be the name of a function defined earlier (like `$z`), or a more complex expression that is parsed, evaluated, printed, and destroyed (e.g.: `print $z & a`, or `print !$z` above). Expects 1 argument (everything that follows `print`).
-*  `delete` (`d`): Deletes the Boolean function with the specified name from the current workspace. Expects 1 argument (everything that follows `delete`).
-*  `quit` (`q`): In the interactive mode, quits the shell. If used in a script, will stop execution. Expects no arguments.
+* `let` (`l`): Defines a new Boolean function in the current workspace, or overwrites an existing one with the same name.
+* `print` (`p`): If the passed Boolean Function is a constant value function, then prints the constant value. Else, prints the truth table.
+*  `delete` (`d`): Deletes the Boolean function with the specified name from the current workspace.
+*  `minterms` (`min`): Prints the minterms of the Boolean function expression passed.
+*  `maxterms` (`max`): Prints the maxterms of the Boolean function expression passed.
+*  `variables` (`v`): Prints the variables that the passed Boolean function is a function of.
+*  `quit` (`q`): In the interactive mode, quits the shell. If used in a script, will stop execution.
 
 ###Operators
 * `$`: Binary operator 'and'
