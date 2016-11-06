@@ -107,9 +107,29 @@ The list of currently defined commands, their aliases in the parenthesis, and wh
 ###Operators
 * `$`: Binary operator 'and'
 * `|`: Binary operator 'or'
-* `^`: Binary opeartor 'xor'
+* `^`: Binary opertor 'xor'
 * `!`: Unary operator 'not'
 * `(`, `)`: Parenthesis for specifying operator precedence.
+* `==`: Binary operator 'equals'. This is a special operator, as it takes in two Boolean functions as arguments, and returns a constant value Boolean function holding the value `0` or `1`. See this example for instance:
+
+```
+let x = (a & b) | (c | d == 1);
+p $x;
+```
+By the lazy precedence rule (see below), the function `x` can be re-written as `(a & b) | (c | (d == 1))`. Since `d == 1` is the constant value Boolean function `0` (because `d` is _not_ the constant `1` always), and `c | 0 == c`, the result is the function `(a & b) | c`. Thus even though `d` was present in the original expression, the use of the `==` operator eliminated the function `x`'s dependency on `d`. Hence, the output:
+
+```
+| c | b | a |
+---------------
+| 0 | 0 | 0 | 0
+| 0 | 0 | 1 | 0
+| 0 | 1 | 0 | 0
+| 0 | 1 | 1 | 1
+| 1 | 0 | 0 | 1
+| 1 | 0 | 1 | 1
+| 1 | 1 | 0 | 1
+| 1 | 1 | 1 | 1
+```
 
 Note: You should always use parenthesis to specify the operator precedence, because there is no agreed upon natural precedence between the different binary operators (unary operators have a natural precedence--they apply to the immediately following operand). For instance: `a | (b & d | !c) & c` can be interpreted as `(a | ((b & d) | !c)) & c` if using _greedy_ precedence, or as `a | ((b & (d | !c)) & c)` if using the _lazy_ precedence.
 The convention here is to use the latter _lazy_ one.
