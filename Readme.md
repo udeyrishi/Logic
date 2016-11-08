@@ -26,7 +26,7 @@ cmake . && make logic_tests
 
 # Or to do everything, use this handy script.
 # Use flag -d for the debug version
-# This will output to the release/bin (or debug/bin) directory
+# This will output to the ./out/release/bin (or ./out/debug/bin) directory
 ./build.py
 ```
 

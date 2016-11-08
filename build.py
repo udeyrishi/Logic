@@ -38,13 +38,14 @@ if __name__ == '__main__':
             pass
 
     build_type = 'debug' if args.debug else 'release'
-    if not os.path.exists(build_type):
-        os.makedirs(build_type)
-    os.chdir(build_type)
+    out_dir = os.path.join('out', build_type)
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+    os.chdir(out_dir)
     cmake_args = ['cmake', '-DCMAKE_BUILD_TYPE=' + build_type]
     if 'COMPILER' in os.environ:
         cmake_args.append('-DCMAKE_CXX_COMPILER=' + os.environ['COMPILER'])
-    cmake_args.append('..')
+    cmake_args.append('../..')
     code = call(cmake_args)
     if code:
         exit(code)

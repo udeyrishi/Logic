@@ -8,6 +8,7 @@ CTestTestfile.cmake
 Makefile
 
 # Output dirs
+out/
 bin/
 release/
 debug/

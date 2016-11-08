@@ -78,5 +78,5 @@ before_install:
 script:
   - ./build.py
   - ./build.py -d
-  - ./debug/bin/logic_tests -d yes --order rand
-  - ./release/bin/logic_tests -d yes --order rand
+  - ./out/debug/bin/logic_tests -d yes --order rand
+  - ./out/release/bin/logic_tests -d yes --order rand
