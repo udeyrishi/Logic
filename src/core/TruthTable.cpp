@@ -17,6 +17,7 @@
 #include <core/TruthTable.hpp>
 #include <iostream>
 #include <core/Exceptions.hpp>
+#include <algorithm>
 #include <unordered_set>
 
 namespace Logic {

@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <string>
+#include <cmath>
 #include <core/TruthTableTypes.hpp>
 
 using namespace std;
