@@ -12,7 +12,7 @@ Requirements:
 * One of (might work with other compilers and/or OSes, but not tested):
 	* macOS with LLVM/clang++ 7.3.0+
 	* Linux with g++ 4.9+
-	* Linux with clang++ 3.6+ 
+	* Linux with clang++ 3.6+
 * cmake
 * make
 * [Optional] Python
@@ -34,14 +34,18 @@ cmake . && make logic_tests
 Assuming the `logic` binary is in your path:
 
 ```sh
-# To launch the shell for an interactive session, go:
-logic
+# Logic usage
+$ logic -h
+Usage:
+  ./logic [options]
+    options:
+      <no option>         : starts in interactive mode if no option is provided
+      [filepath]          : executes the code in the text file located at <filepath>
+      -c, --code [code]   : executes the code string passed as the command line arg itself
+      -h, --help          : print this usage info
 
-# You can also use logic for interpreting a source file:
-logic <path to file>
-
-# To run the tests:
-path/to/binary/logic_tests
+# To run the tests
+$ path/to/binary/logic_tests
 ```
 
 ##Language basics
