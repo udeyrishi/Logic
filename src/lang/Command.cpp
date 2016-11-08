@@ -76,7 +76,10 @@ bool PrintMintermsCommand::execute(const string &expression, Runtime &runtime, o
 }
 
 bool PrintVariablesCommand::execute(const string &expression, Runtime &runtime, ostream &out) {
-    out << join(parse(expression, runtime).getTruthTable().getVariables(), ", ") << endl;
+    vector<string> variables = parse(expression, runtime).getTruthTable().getVariables();
+    // This is how the variables are shown in the truth table -- little endian
+    reverse(variables.begin(), variables.end());
+    out << join(variables, ", ") << endl;
     return true;
 }
 

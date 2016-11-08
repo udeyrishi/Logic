@@ -104,11 +104,11 @@ The first word in every line of Logic code is a command. Everything that follows
 The list of currently defined commands, their aliases in the parenthesis, and what they do:
 
 * `let` (`l`): Defines a new Boolean function in the current workspace, or overwrites an existing one with the same name.
-* `print` (`p`): If the passed Boolean Function is a constant value function, then prints the constant value. Else, prints the truth table.
+* `print` (`p`): If the passed Boolean Function is a constant value function, then prints the constant value. Else, prints the truth table. The header of the truth table is the list of variables in little ending format (highest index variable is the leftmost, lowest is the rightmost).
 *  `delete` (`d`): Deletes the Boolean function with the specified name from the current workspace.
 *  `minterms` (`min`): Prints the minterms of the Boolean function expression passed.
 *  `maxterms` (`max`): Prints the maxterms of the Boolean function expression passed.
-*  `variables` (`v`): Prints the variables that the passed Boolean function is a function of.
+*  `variables` (`v`): Prints the variables that the passed Boolean function is a function of in little ending format (highest index variable is the leftmost, lowest is the rightmost).
 *  `quit` (`q`): In the interactive mode, quits the shell. If used in a script, will stop execution.
 
 ###Operators
