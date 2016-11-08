@@ -15,16 +15,9 @@
 */
 
 #include <core/TruthTableTypes.hpp>
-#include <string>
 #include <iostream>
 
 namespace Logic {
-template <typename TException>
-void TruthTableVariablesUInt::assertFits(const uint64_t value) {
-    if (value > MAX_NUM_VARIABLES) {
-        throw TException("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
-    }
-}
 
 TruthTableVariablesUInt &TruthTableVariablesUInt::operator++() {
     ++value;

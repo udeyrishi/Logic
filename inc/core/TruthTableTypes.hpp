@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #include <stdexcept>
+#include <string>
 #include <unordered_map>
 
 using namespace std;
@@ -55,7 +56,11 @@ public:
     bool operator==(const uint64_t &rhs) const;
 
     template <typename TException>
-    static void assertFits(const uint64_t value);
+    static void assertFits(const uint64_t value) {
+        if (value > MAX_NUM_VARIABLES) {
+            throw TException("Value needs to be in range: 0 <= x <= " + to_string(MAX_NUM_VARIABLES));
+        }
+    }
 private:
     uint8_t value;
 };
