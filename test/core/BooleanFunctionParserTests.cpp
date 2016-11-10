@@ -49,15 +49,14 @@ SCENARIO("A BooleanFunctionAccumulator applies a unary operator pushed on top of
         accumulator.push(function);
 
         WHEN("A unary operator is pushed, and then the result is popped") {
-            UnaryOperator<bool> *_operator = new Not<bool>();
+            UnaryOperator *_operator = new Not();
             accumulator.push(*_operator);
             delete _operator;
             BooleanFunction result = accumulator.pop();
 
             THEN("The result = operator(original function)") {
-                UnaryOperator<bool> *_operator = new Not<bool>();
-                BooleanFunction notted = function.operate(*_operator);
-                delete _operator;
+                Not _operator;
+                BooleanFunction notted = _operator(function);
                 REQUIRE(notted == result);
                 REQUIRE(!accumulator.canBePopped());
             }
@@ -78,15 +77,14 @@ SCENARIO("A BooleanFunctionAccumulator applies a binary operator", "[BooleanFunc
         accumulator.push(function2);
 
         WHEN("A binary operator is pushed, and then the result is popped") {
-            BinaryOperator<bool> *_operator = new And<bool>();
+            BinaryOperator *_operator = new And();
             accumulator.push(*_operator);
             delete _operator;
             BooleanFunction result = accumulator.pop();
 
             THEN("The result = operator(original functions)") {
-                BinaryOperator<bool> *_operator = new And<bool>();
-                BooleanFunction anded = function.operate(*_operator, function2);
-                delete _operator;
+                And _operator;
+                BooleanFunction anded = _operator(function, function2);
                 REQUIRE(anded == result);
                 REQUIRE(!accumulator.canBePopped());
             }

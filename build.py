@@ -29,11 +29,7 @@ if __name__ == '__main__':
 
     if args.rebuild:
         try:
-            shutil.rmtree('debug')
-        except OSError:
-            pass
-        try:
-            shutil.rmtree('release')
+            shutil.rmtree('out')
         except OSError:
             pass
 

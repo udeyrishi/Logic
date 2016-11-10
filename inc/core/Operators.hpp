@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 #include <regex>
+#include <core/BooleanFunction.hpp>
+#include <core/TruthTable.hpp>
 
 using namespace std;
 
@@ -37,86 +39,76 @@ static const vector<string> OPERATOR_REGEXES({
                                           XOR_REGEX,
                                           EQUALS_REGEX });
 
-template <typename T>
 class UnaryOperator {
 public:
-    virtual T operator()(const T in) = 0;
+    virtual BooleanFunction operator()(const BooleanFunction &in) const = 0;
     virtual ~UnaryOperator() {
     }
 };
 
-template <typename T>
 class BinaryOperator {
 public:
-    virtual T operator()(const T first, const T second) = 0;
+    virtual BooleanFunction operator()(const BooleanFunction &first, const BooleanFunction &second) const = 0;
     virtual ~BinaryOperator() {
     }
 };
 
-template <typename T>
-class Not : public UnaryOperator<T> {
+class BoolTransformationUnaryOperator : public UnaryOperator {
 public:
-    virtual T operator()(const T in) {
+    virtual BooleanFunction operator()(const BooleanFunction &in) const;
+
+private:
+    virtual bool operate(const bool in) const = 0;
+};
+
+class Not : public BoolTransformationUnaryOperator {
+private:
+    virtual bool operate(const bool in) const {
         return !in;
     }
 };
 
-template <typename T>
-class Or : public BinaryOperator<T> {
+class Equals : public BinaryOperator {
 public:
-    virtual T operator()(const T first, const T second) {
+    virtual BooleanFunction operator()(const BooleanFunction &first, const BooleanFunction &second) const {
+        return first == second;
+    }
+};
+
+class CombinatoryBinaryOperator : public BinaryOperator {
+public:
+    virtual BooleanFunction operator()(const BooleanFunction &first, const BooleanFunction &second) const;
+
+private:
+    TruthTable combineColumnsWithSameVariables(const TruthTableBuilder &rawBuilder) const;
+    TruthTableBuilder combineTables(const BooleanFunction &first, const BooleanFunction &second) const;
+    virtual bool operate(const bool first, const bool second) const = 0;
+};
+
+class Or : public CombinatoryBinaryOperator {
+private:
+    virtual bool operate(const bool first, const bool second) const {
         return first || second;
     }
 };
 
-template <typename T>
-class And : public BinaryOperator<T> {
-public:
-    virtual T operator()(const T first, const T second) {
+class And : public CombinatoryBinaryOperator {
+private:
+    virtual bool operate(const bool first, const bool second) const {
         return first && second;
     }
 };
 
-template <typename T>
-class Xor : public BinaryOperator<T> {
-public:
-    virtual T operator()(const T first, const T second) {
+class Xor : public CombinatoryBinaryOperator {
+private:
+    virtual bool operate(const bool first, const bool second) const {
         return first != second;
-    }
-};
-
-template <typename T>
-class Equals : public BinaryOperator<T> {
-public:
-    virtual T operator()(const T first, const T second) {
-        return first == second;
     }
 };
 
 bool isKnownUnaryOperator(const string &_operator);
 bool isKnownBinaryOperator(const string &_operator);
 
-// Need to leave this implementation in the header, because else the linker freaks out
-template <typename T>
-UnaryOperator<T> *createUnaryOperatorWithSymbol(const string &_operator) {
-    if (regex_match(_operator, regex(NOT_REGEX))) {
-        return new Not<T>();
-    }
-    throw invalid_argument("Unknown operator: " + _operator);
-}
-
-// Need to leave this implementation in the header, because else the linker freaks out
-template <typename T>
-BinaryOperator<T> *createBinaryOperatorWithSymbol(const string &_operator) {
-    if (regex_match(_operator, regex(AND_REGEX))) {
-        return new And<T>();
-    } else if (regex_match(_operator, regex(OR_REGEX)))  {
-        return new Or<T>();
-    } else if (regex_match(_operator, regex(XOR_REGEX)))  {
-        return new Xor<T>();
-    } else if (regex_match(_operator, regex(EQUALS_REGEX)))  {
-        return new Equals<T>();
-    }
-    throw invalid_argument("Unknown operator: " + _operator);
-}
+UnaryOperator *createUnaryOperatorWithSymbol(const string &_operator);
+BinaryOperator *createBinaryOperatorWithSymbol(const string &_operator);
 }

@@ -58,22 +58,20 @@ void BooleanFunctionAccumulator::push(const BooleanFunction &function) {
     _stack.push(function);
 }
 
-template <typename T>
-void BooleanFunctionAccumulator::push(UnaryOperator<T> &_operator) {
+void BooleanFunctionAccumulator::push(UnaryOperator &_operator) {
     if (_stack.empty()) {
         throw IllegalStateException("Cannot push a unary operator on an empty stack.");
     }
-    _stack.push(topAndPop(_stack).operate(_operator));
+    _stack.push(_operator(topAndPop(_stack)));
 }
 
-template <typename T>
-void BooleanFunctionAccumulator::push(BinaryOperator<T> &_operator) {
+void BooleanFunctionAccumulator::push(BinaryOperator &_operator) {
     if (_stack.size() < 2) {
         throw IllegalStateException("Cannot push a binary operator on an stack of size less than 2");
     }
     BooleanFunction operand2 = topAndPop(_stack);
     BooleanFunction operand1 = topAndPop(_stack);
-    _stack.push(operand1.operate(_operator, operand2));
+    _stack.push(_operator(operand1, operand2));
 }
 
 BooleanFunction BooleanFunctionAccumulator::pop() {
@@ -213,21 +211,13 @@ BooleanFunction BooleanFunctionParser::parse(const string &function, std::functi
     BooleanFunctionAccumulator accumulator;
     for (const string &token : postfixTokens) {
         if (isKnownUnaryOperator(token)) {
-            UnaryOperator<bool> *op = createUnaryOperatorWithSymbol<bool>(token);
+            UnaryOperator *op = createUnaryOperatorWithSymbol(token);
             accumulator.push(*op);
             delete op;
         } else if (isKnownBinaryOperator(token)) {
-            if (regex_match(token, regex(EQUALS_REGEX))) {
-                // This is not a bool-level operator. This a BooleanFunction level operator, because
-                // the result is a constant value Boolean Function
-                Equals<BooleanFunction> equalsOperator;
-                accumulator.push(equalsOperator);
-            } else {
-                BinaryOperator<bool> *op = createBinaryOperatorWithSymbol<bool>(token);
+                BinaryOperator *op = createBinaryOperatorWithSymbol(token);
                 accumulator.push(*op);
                 delete op;
-            }
-
         } else {
             // token == variable
             if (token.c_str()[0] == '$') {

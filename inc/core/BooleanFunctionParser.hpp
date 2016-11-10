@@ -28,14 +28,8 @@ namespace Logic {
 class BooleanFunctionAccumulator {
 public:
     void push(const BooleanFunction &function);
-
-    // The template typename, T, is any type that is supported by BooleanFunction::operate()
-    template <typename T>
-    void push(UnaryOperator<T> &_operator);
-
-    // The template typename, T, is any type that is supported by BooleanFunction::operate()
-    template <typename T>
-    void push(BinaryOperator<T> &_operator);
+    void push(UnaryOperator &_operator);
+    void push(BinaryOperator &_operator);
 
     BooleanFunction pop();
     bool canBePopped();
