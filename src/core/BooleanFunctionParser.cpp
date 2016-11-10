@@ -22,7 +22,6 @@
 #include <core/Exceptions.hpp>
 #include <core/Utils.hpp>
 #include <utility>
-#include <cassert>
 
 using namespace Logic;
 using namespace std;
@@ -128,10 +127,6 @@ static vector<string> getPostfixTokens(const string &function) {
     const regex stackItemsRegex(join(operatorStackItems, "|"));
     smatch sm;
 
-    // bool to track that a parenthesis was just closed, and if a suffix unary operator is found, it
-    // needs to applied to the preceding term
-    bool parenthesisClosed = false;
-
     for (size_t i = 0; i < infixTokens.size(); ++i) {
         const string &token = infixTokens[i];
 
@@ -175,21 +170,15 @@ static vector<string> getPostfixTokens(const string &function) {
                     postfixTokens.push_back(top);
                 }
             }
-            parenthesisClosed = true;
         } else if (regex_match(token, sm, stackItemsRegex)) {
             if (isKnownSuffixUnaryOperator(token)) {
-                assert(parenthesisClosed && "Suffix unary operator location validation has a bug");
                 postfixTokens.push_back(token);
-                // Keep parenthesisClosed = true, because you can have more suffix unary operators following
             } else {
                 operatorStack.push(token);
-                // A non-suffix unary opertor was pushed. Turn off parenthesisClosed
-                parenthesisClosed = false;
             }
         } else {
             // Not ")" or "(", and not matching operator regexes, but still in the list of infix tokens
             // => must be a variable name or a constant
-            assert(!parenthesisClosed && "sanity check failure: parenthesisClosed should've been false, because ( was pushed earlier");
             postfixTokens.push_back(token);
         }
     }
