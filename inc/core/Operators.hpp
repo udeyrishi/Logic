@@ -19,7 +19,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <regex>
 #include <core/BooleanFunction.hpp>
 #include <core/TruthTable.hpp>
 
@@ -32,12 +31,14 @@ static const string AND_REGEX("[&]");
 static const string OR_REGEX("[\\|]");
 static const string XOR_REGEX("[\\^]");
 static const string EQUALS_REGEX("[=]{2}");
+static const string INDEX_REGEX("[\\[]{1}([\\d]+)[\\]]{1}");
 static const vector<string> OPERATOR_REGEXES({
                                           NOT_REGEX,
                                           AND_REGEX,
                                           OR_REGEX,
                                           XOR_REGEX,
-                                          EQUALS_REGEX });
+                                          EQUALS_REGEX,
+                                          INDEX_REGEX });
 
 class UnaryOperator {
 public:
@@ -51,6 +52,16 @@ public:
     virtual BooleanFunction operator()(const BooleanFunction &first, const BooleanFunction &second) const = 0;
     virtual ~BinaryOperator() {
     }
+};
+
+class Index : public UnaryOperator {
+public:
+    Index(const TruthTableUInt index) : index(index) {
+    }
+
+    virtual BooleanFunction operator()(const BooleanFunction &in) const;
+private:
+    const TruthTableUInt index;
 };
 
 class BoolTransformationUnaryOperator : public UnaryOperator {

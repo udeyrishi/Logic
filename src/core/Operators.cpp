@@ -17,13 +17,15 @@
 #include <core/Operators.hpp>
 #include <core/Utils.hpp>
 #include <unordered_set>
+#include <regex>
 
 using namespace std;
 
 namespace Logic {
 
 bool isKnownUnaryOperator(const string &_operator) {
-    return regex_match(_operator, regex(NOT_REGEX));
+    regex unaryOperators(join<string>({ NOT_REGEX, INDEX_REGEX }, "|"));
+    return regex_match(_operator, unaryOperators);
 }
 
 bool isKnownBinaryOperator(const string &_operator) {
@@ -34,6 +36,15 @@ bool isKnownBinaryOperator(const string &_operator) {
 UnaryOperator *createUnaryOperatorWithSymbol(const string &_operator) {
     if (regex_match(_operator, regex(NOT_REGEX))) {
         return new Not();
+    } else if (regex_match(_operator, regex(INDEX_REGEX))) {
+        regex operatorRegex(INDEX_REGEX);
+        smatch sm;
+
+        if (!regex_search(_operator, sm, operatorRegex, regex_constants::match_continuous)) {
+            throw invalid_argument("Invalid index operator: " + _operator);
+        }
+
+        return new Index(stoul(sm[1]));
     }
     throw invalid_argument("Unknown operator: " + _operator);
 }
@@ -195,5 +206,13 @@ BooleanFunction CombinatoryBinaryOperator::operator()(const BooleanFunction &fir
         }
     }
     return BooleanFunction(clone);
+}
+
+BooleanFunction Index::operator()(const BooleanFunction &in) const {
+    if (in.isConstant()) {
+        return BooleanFunction(in.getConstantValue());
+    }
+
+    return BooleanFunction(in.getTruthTable()[index]);
 }
 }
