@@ -31,7 +31,7 @@ static const string AND_REGEX("[&]");
 static const string OR_REGEX("[\\|]");
 static const string XOR_REGEX("[\\^]");
 static const string EQUALS_REGEX("[=]{2}");
-static const string INDEX_REGEX("[\\[]{1}([\\d]+)[\\]]{1}");
+static const string INDEX_REGEX("[\\[]{1}[\\s]*([\\d]+)[\\s]*[\\]]{1}");
 static const vector<string> OPERATOR_REGEXES({
                                           NOT_REGEX,
                                           AND_REGEX,
