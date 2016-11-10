@@ -89,11 +89,11 @@ void TruthTable::validateIndex(const TruthTableUInt index) const {
     }
 }
 
-TruthTableCondition TruthTable::conditionBuilder() {
+TruthTableCondition TruthTable::conditionBuilder() const {
     return TruthTableCondition(this);
 }
 
-TruthTableCondition::TruthTableCondition(TruthTable *table) : builder(nullptr), table(table) {
+TruthTableCondition::TruthTableCondition(const TruthTable *table) : builder(nullptr), table(table) {
 }
 
 TruthTableCondition::TruthTableCondition(const TruthTableCondition &rhs) : builder(nullptr), table(rhs.table) {

@@ -31,14 +31,18 @@ static const string AND_REGEX("[&]");
 static const string OR_REGEX("[\\|]");
 static const string XOR_REGEX("[\\^]");
 static const string EQUALS_REGEX("[=]{2}");
+// The CONDITIONS_REGEX was match the INDEX_REGEX strings as well, so
+// check for the INDEX_REGEX first
 static const string INDEX_REGEX("[\\[]{1}[\\s]*([\\d]+)[\\s]*[\\]]{1}");
+static const string CONDITIONS_REGEX("[\\[]{1}[\\s]*(.+)[\\s]*[\\]]{1}");
 static const vector<string> OPERATOR_REGEXES({
                                           NOT_REGEX,
                                           AND_REGEX,
                                           OR_REGEX,
                                           XOR_REGEX,
                                           EQUALS_REGEX,
-                                          INDEX_REGEX });
+                                          INDEX_REGEX,
+                                          CONDITIONS_REGEX });
 
 class UnaryOperator {
 public:
@@ -52,16 +56,6 @@ public:
     virtual BooleanFunction operator()(const BooleanFunction &first, const BooleanFunction &second) const = 0;
     virtual ~BinaryOperator() {
     }
-};
-
-class Index : public UnaryOperator {
-public:
-    Index(const TruthTableUInt index) : index(index) {
-    }
-
-    virtual BooleanFunction operator()(const BooleanFunction &in) const;
-private:
-    const TruthTableUInt index;
 };
 
 class BoolTransformationUnaryOperator : public UnaryOperator {
@@ -115,6 +109,27 @@ private:
     virtual bool operate(const bool first, const bool second) const {
         return first != second;
     }
+};
+
+class Index : public UnaryOperator {
+public:
+    Index(const TruthTableUInt index) : index(index) {
+    }
+
+    virtual BooleanFunction operator()(const BooleanFunction &in) const;
+private:
+    const TruthTableUInt index;
+};
+
+class Conditions : public UnaryOperator {
+public:
+    Conditions(const vector<pair<string, bool>> &conditions) : conditions(conditions) {
+    }
+
+    virtual BooleanFunction operator()(const BooleanFunction &in) const;
+
+private:
+    const vector<pair<string, bool>> conditions;
 };
 
 bool isKnownPrefixUnaryOperator(const string &_operator);

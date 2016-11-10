@@ -43,7 +43,7 @@ public:
     __TruthTableValueProxy operator[](const TruthTableUInt index);
     bool operator[](const TruthTableUInt index) const;
 
-    TruthTableCondition conditionBuilder();
+    TruthTableCondition conditionBuilder() const;
 
     vector<TruthTableUInt> getMinterms();
     vector<TruthTableUInt> getMaxterms();
@@ -124,13 +124,13 @@ public:
     bool getConstant() const;
     TruthTable getTruthTable() const;
 private:
-    TruthTableCondition(TruthTable *table);
+    TruthTableCondition(const TruthTable *table);
 
     friend class TruthTable;
 
     TruthTableBuilder *builder;
     // TruthTableCondition does NOT own table
-    TruthTable *table;
+    const TruthTable *table;
     unordered_map<TruthTableVariablesUInt, bool> conditions;
 };
 }
