@@ -211,53 +211,28 @@ BooleanFunction BooleanFunctionParser::parse(const string &function) const {
     });
 }
 
-static string CONDITION_SPECIFIER = ":";
-
-vector<pair<string, bool>> parseConditions(const string &rawConditions) {
-    const vector<string> conditionStrings = split(rawConditions, ',');
-    if (conditionStrings.empty()) {
-        throw BadBooleanFunctionException("No conditions specified after the operator '" + CONDITION_SPECIFIER + "'");
-    }
-
-    vector<pair<string, bool>> conditions;
-    for (const string &condition : conditionStrings) {
-        vector<string> conditionDef = split(trim(condition), '=');
-        if (conditionDef.size() != 2) {
-            throw BadBooleanFunctionException("Illegal condition format: " + condition);
-        }
-
-        string var = trim(conditionDef[0]);
-        string val = trim(conditionDef[1]);
-        if (var.empty() || val.empty()) {
-            throw BadBooleanFunctionException("Illegal condition format: " + condition);
-        }
-
-        bool boolVal;
-        if (val == "1") {
-            boolVal = true;
-        } else if (val == "0") {
-            boolVal = false;
-        } else {
-            throw BadBooleanFunctionException("Illegal condition value " + val + " for variable " + var);
-        }
-        conditions.push_back(make_pair(var, boolVal));
-    }
-    return conditions;
-}
-
 BooleanFunction BooleanFunctionParser::parse(const string &function, std::function<const BooleanFunction& (const string&)> lookupFunction) const {
-    size_t indexOfConditionSpecifier = function.find(CONDITION_SPECIFIER);
-    vector<string> postfixTokens = getPostfixTokens(trim(indexOfConditionSpecifier == string::npos ? function : function.substr(0, indexOfConditionSpecifier)));
+    vector<string> postfixTokens = getPostfixTokens(trim(function));
     BooleanFunctionAccumulator accumulator;
     for (const string &token : postfixTokens) {
         if (isKnownUnaryOperator(token)) {
-            UnaryOperator *op = createUnaryOperatorWithSymbol(token);
+            UnaryOperator *op;
+            try {
+                op = createUnaryOperatorWithSymbol(token);
+            } catch (const invalid_argument &ex) {
+                throw BadBooleanFunctionException(ex.what());
+            }
             accumulator.push(*op);
             delete op;
         } else if (isKnownBinaryOperator(token)) {
-                BinaryOperator *op = createBinaryOperatorWithSymbol(token);
-                accumulator.push(*op);
-                delete op;
+            BinaryOperator *op;
+            try {
+                op = createBinaryOperatorWithSymbol(token);
+            } catch (const invalid_argument &ex) {
+                throw BadBooleanFunctionException(ex.what());
+            }
+            accumulator.push(*op);
+            delete op;
         } else {
             // token == variable
             if (token.c_str()[0] == '$') {
@@ -285,22 +260,6 @@ BooleanFunction BooleanFunctionParser::parse(const string &function, std::functi
         throw BadBooleanFunctionException("Missing operator tokens in the boolean function.");
     }
 
-    BooleanFunction parsed = accumulator.pop();
-    if (indexOfConditionSpecifier == string::npos) {
-        return parsed;
-    }
-
-    const vector<pair<string, bool>> conditions = parseConditions(trim(function.substr(indexOfConditionSpecifier + 1, string::npos)));
-    TruthTableCondition truthTableCondition = parsed.getTruthTable().conditionBuilder();
-    for (const pair<string, bool> &condition : conditions) {
-        truthTableCondition.addCondition(condition.first, condition.second);
-    }
-    truthTableCondition.process();
-
-    if (truthTableCondition.hasCollapsedToConstant()) {
-        return BooleanFunction(truthTableCondition.getConstant());
-    } else {
-        return BooleanFunction(truthTableCondition.getTruthTable());
-    }
+    return accumulator.pop();
 }
 }

@@ -28,7 +28,7 @@ bool isKnownUnaryOperator(const string &_operator) {
 }
 
 bool isKnownSuffixUnaryOperator(const string &_operator) {
-    regex unaryOperators(join<string>({ INDEX_REGEX }, "|"));
+    regex unaryOperators(join<string>({ INDEX_REGEX, CONDITIONS_REGEX }, "|"));
     return regex_match(_operator, unaryOperators);
 }
 
@@ -40,6 +40,38 @@ bool isKnownPrefixUnaryOperator(const string &_operator) {
 bool isKnownBinaryOperator(const string &_operator) {
     regex binaryOperators(join<string>({ AND_REGEX, OR_REGEX, XOR_REGEX, EQUALS_REGEX }, "|"));
     return regex_match(_operator, binaryOperators);
+}
+
+static vector<pair<string, bool>> parseConditions(const string &rawConditions) {
+    const vector<string> conditionStrings = split(rawConditions, ',');
+    if (conditionStrings.empty()) {
+        throw invalid_argument("No conditions specified after the operator ':'");
+    }
+
+    vector<pair<string, bool>> conditions;
+    for (const string &condition : conditionStrings) {
+        vector<string> conditionDef = split(trim(condition), '=');
+        if (conditionDef.size() != 2) {
+            throw invalid_argument("Illegal condition format: " + condition);
+        }
+
+        string var = trim(conditionDef[0]);
+        string val = trim(conditionDef[1]);
+        if (var.empty() || val.empty()) {
+            throw invalid_argument("Illegal condition format: " + condition);
+        }
+
+        bool boolVal;
+        if (val == "1") {
+            boolVal = true;
+        } else if (val == "0") {
+            boolVal = false;
+        } else {
+            throw invalid_argument("Illegal condition value " + val + " for variable " + var);
+        }
+        conditions.push_back(make_pair(var, boolVal));
+    }
+    return conditions;
 }
 
 UnaryOperator *createUnaryOperatorWithSymbol(const string &_operator) {
@@ -54,6 +86,15 @@ UnaryOperator *createUnaryOperatorWithSymbol(const string &_operator) {
         }
 
         return new Index(stoul(sm[1]));
+    } else if (regex_match(_operator, regex(CONDITIONS_REGEX))) {
+        regex operatorRegex(CONDITIONS_REGEX);
+        smatch sm;
+
+        if (!regex_search(_operator, sm, operatorRegex, regex_constants::match_continuous)) {
+            throw invalid_argument("Invalid conditions operator: " + _operator);
+        }
+
+        return new Conditions(parseConditions(sm[1]));
     }
     throw invalid_argument("Unknown operator: " + _operator);
 }
@@ -223,5 +264,19 @@ BooleanFunction Index::operator()(const BooleanFunction &in) const {
     }
 
     return BooleanFunction(in.getTruthTable()[index]);
+}
+
+BooleanFunction Conditions::operator()(const BooleanFunction &in) const {
+    TruthTableCondition truthTableCondition = in.getTruthTable().conditionBuilder();
+    for (const pair<string, bool> &condition : conditions) {
+        truthTableCondition.addCondition(condition.first, condition.second);
+    }
+    truthTableCondition.process();
+
+    if (truthTableCondition.hasCollapsedToConstant()) {
+        return BooleanFunction(truthTableCondition.getConstant());
+    } else {
+        return BooleanFunction(truthTableCondition.getTruthTable());
+    }
 }
 }

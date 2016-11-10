@@ -137,6 +137,41 @@ By the lazy precedence rule (see below), the function `x` can be re-written as `
 | 1 | 1 | 0 | 1
 | 1 | 1 | 1 | 1
 ```
+* `[<unsigned int>]`: The index operator. If the passed function is a non-constant function, returns a constant value Boolean function having the value of the passed function's truth table at the specified index. Else, it is a no-op, and just returns the passed constant value function itself.
+
+```
+# Constant function case
+>> let x = 1;
+>> p $x[1000000];
+1 
+
+# Truth table function case
+>> let x = a & b;
+>> p $x[3];
+1
+>> p $x[2];
+0
+>> p $x[4];
+>> ERROR: index needs to be in range: [0, 3]
+```
+
+* `[k1=v1, k2=v2,...]`: The condition operator. This operator applies the specified conditions to the passed function, and returns the resulting function.
+
+```
+let x = ((a & b) | c)[b = 1, a = 0];
+p (($x | d) | e)[d = 1];
+```
+
+Here, `x` is the function `(a & b) | c`, when `b` is true and `a` is false. That simplifies to `let x = c`. Then, the args to the `p` command are `($x | d) | e` (simplifies to `(c | d) | e`) when `d` is true. That simplifies to a function of c and e that is always true. So, the output is:
+
+```
+| e | c |
+-----------
+| 0 | 0 | 1
+| 0 | 1 | 1
+| 1 | 0 | 1
+| 1 | 1 | 1
+```
 
 Note: You should always use parenthesis to specify the operator precedence, because there is no agreed upon natural precedence between the different binary operators (unary operators have a natural precedence--they apply to the immediately following operand). For instance: `a | (b & d | !c) & c` can be interpreted as `(a | ((b & d) | !c)) & c` if using _greedy_ precedence, or as `a | ((b & (d | !c)) & c)` if using the _lazy_ precedence.
 The convention here is to use the latter _lazy_ one.
@@ -181,29 +216,6 @@ Here, even though the value of the Boolean function named `x` is changed later t
 ```
 
 Also note that the `$` has the highest precedence. For instance, in the above example, the value of `x` is first computed, and then xor-ed with `c` to get the Boolean function for `y`. So, the equivalent definition would be `let y = (a & b) ^ c;` (and not `a & (b ^ c)`, which would've been the case if you went `let y = a & b ^ c`).
-
-#### `:` (the colon sign):
-You can use the colon sign towards the end of the Boolean function to specify a comma separated list of values of certain variables. This will then collapse the function by abiding to these conditions, and only return the result. e.g.:
-
-```
-let x = (a & b) | c : b = 1, a = 0;
-p ($x | d) | e : d = 1;
-```
-
-Here, `x` is the function `(a & b) | c`, when `b` is true and `a` is false. That simplifies to `let x = c`. Then, the args to the `p` command are `($x | d) | e` (simplifies to `(c | d) | e`) when `d` is true. That simplifies to a function of c and e that is always true. So, the output is:
-
-```
-| e | c |
------------
-| 0 | 0 | 1
-| 0 | 1 | 1
-| 1 | 0 | 1
-| 1 | 1 | 1
-```
-
-Note that after applying the conditions, you could be left with a constant value Boolean function. The output in that case will be `0` or `1`, as was shown in the introductary section above.
-
-You can use the `:` token in a `let` command or in a `print` command. You can use it exactly once towards the end of the function definition.
 
 #### `;` (the semi-colon sign):
 Marks the end of line of code. The first whitespace separated word between two successive `;` will be interpreted as the command, and everything else will be passed as the arguments to that command.
