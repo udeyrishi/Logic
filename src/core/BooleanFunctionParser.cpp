@@ -22,6 +22,7 @@
 #include <core/Exceptions.hpp>
 #include <core/Utils.hpp>
 #include <utility>
+#include <cassert>
 
 using namespace Logic;
 using namespace std;
@@ -127,7 +128,34 @@ static vector<string> getPostfixTokens(const string &function) {
     const regex stackItemsRegex(join(operatorStackItems, "|"));
     smatch sm;
 
-    for (const string &token : infixTokens) {
+    // bool to track that a parenthesis was just closed, and if a suffix unary operator is found, it
+    // needs to applied to the preceding term
+    bool parenthesisClosed = false;
+
+    for (size_t i = 0; i < infixTokens.size(); ++i) {
+        const string &token = infixTokens[i];
+
+        // Validate that if the token is a prefix unary operator, it has a valid token that follows
+        if (isKnownPrefixUnaryOperator(token)) {
+            // prefix unary operator can't be the last token
+            if (i == infixTokens.size() - 1 ||
+            // prefix unary operator can only follow a parenthesis or another prefix unary operator
+                !(infixTokens[i+1] == "(" || isKnownPrefixUnaryOperator(infixTokens[i+1]))) {
+                throw BadBooleanFunctionException("Misplaced prefix unary operator: " + token);
+            }
+        }
+
+        // Validate that if the token is a suffix unary operator, it has a valid token that followed
+        if (isKnownSuffixUnaryOperator(token)) {
+            // suffix unary operator can't be the first token
+            if (i == 0 ||
+                !(infixTokens[i-1] == ")" || isKnownSuffixUnaryOperator(infixTokens[i-1]))) {
+                throw BadBooleanFunctionException("Misplaced suffix unary operator: " + token);
+            }
+        }
+
+        // At this point, we know that prefix and suffix unary operators are at the correct logical locations
+
         if (token == ")") {
             while (true) {
                 if (operatorStack.empty()) {
@@ -136,20 +164,32 @@ static vector<string> getPostfixTokens(const string &function) {
 
                 string top = topAndPop(operatorStack);
                 if (top == "(") {
-                    // unary operators have the opposite precedence. They need to applied to first
-                    while (!operatorStack.empty() && isKnownUnaryOperator(operatorStack.top())) {
+                    // Prefix unary operators are expected right before the opening parenthesis.
+                    // So push these to the postFixTokens list right here
+                    while (!operatorStack.empty() && isKnownPrefixUnaryOperator(operatorStack.top())) {
                         string unaryOperator = topAndPop(operatorStack);
                         postfixTokens.push_back(unaryOperator);
                     }
                     break;
+                } else {
+                    postfixTokens.push_back(top);
                 }
-                postfixTokens.push_back(top);
             }
+            parenthesisClosed = true;
         } else if (regex_match(token, sm, stackItemsRegex)) {
-            operatorStack.push(token);
+            if (isKnownSuffixUnaryOperator(token)) {
+                assert(parenthesisClosed && "Suffix unary operator location validation has a bug");
+                postfixTokens.push_back(token);
+                // Keep parenthesisClosed = true, because you can have more suffix unary operators following
+            } else {
+                operatorStack.push(token);
+                // A non-suffix unary opertor was pushed. Turn off parenthesisClosed
+                parenthesisClosed = false;
+            }
         } else {
             // Not ")" or "(", and not matching operator regexes, but still in the list of infix tokens
             // => must be a variable name or a constant
+            assert(!parenthesisClosed && "sanity check failure: parenthesisClosed should've been false, because ( was pushed earlier");
             postfixTokens.push_back(token);
         }
     }

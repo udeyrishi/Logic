@@ -24,7 +24,16 @@ using namespace std;
 namespace Logic {
 
 bool isKnownUnaryOperator(const string &_operator) {
-    regex unaryOperators(join<string>({ NOT_REGEX, INDEX_REGEX }, "|"));
+    return isKnownPrefixUnaryOperator(_operator) || isKnownSuffixUnaryOperator(_operator);
+}
+
+bool isKnownSuffixUnaryOperator(const string &_operator) {
+    regex unaryOperators(join<string>({ INDEX_REGEX }, "|"));
+    return regex_match(_operator, unaryOperators);
+}
+
+bool isKnownPrefixUnaryOperator(const string &_operator) {
+    regex unaryOperators(join<string>({ NOT_REGEX }, "|"));
     return regex_match(_operator, unaryOperators);
 }
 

@@ -117,6 +117,8 @@ private:
     }
 };
 
+bool isKnownPrefixUnaryOperator(const string &_operator);
+bool isKnownSuffixUnaryOperator(const string &_operator);
 bool isKnownUnaryOperator(const string &_operator);
 bool isKnownBinaryOperator(const string &_operator);
 
