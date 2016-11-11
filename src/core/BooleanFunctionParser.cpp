@@ -36,7 +36,6 @@ static T topAndPop(stack<T> &_stack) {
 }
 
 namespace Logic {
-static const string VARIABLE_REGEX = "[\\$a-zA-Z]+";
 static string getInfixTokensRegex() {
     static string result;
     unique_lock<mutex> lock(infixTokenRegexMutex);
@@ -44,7 +43,7 @@ static string getInfixTokensRegex() {
         vector<string> tokens = OPERATOR_REGEXES;
         tokens.push_back("[\\(]");
         tokens.push_back("[\\)]");
-        tokens.push_back(VARIABLE_REGEX);
+        tokens.push_back("[\\$]?" + VARIABLE_REGEX);
         tokens.push_back("[1]");
         tokens.push_back("[0]");
         result = "[\\s]*(" + // Optional leading spaces

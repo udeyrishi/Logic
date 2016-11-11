@@ -25,6 +25,8 @@
 using namespace std;
 
 namespace Logic {
+static const string VARIABLE_REGEX = "[a-zA-Z_][a-zA-Z_0-9]*";
+
 class BooleanFunctionAccumulator {
 public:
     void push(const BooleanFunction &function);

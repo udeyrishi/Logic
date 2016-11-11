@@ -23,9 +23,9 @@
 
 using namespace std;
 
-static const regex CREATE_ARGS_REGEX("\\s*([a-zA-Z]+)\\s*[=]\\s*(.+)\\s*");
-
 namespace Logic {
+static const regex CREATE_ARGS_REGEX("\\s*(" + VARIABLE_REGEX + ")\\s*[=]\\s*(.+)\\s*");
+
 const vector<string> CreateBooleanFunctionCommand::SYMBOLS = {"let", "l"};
 const vector<string> PrintBooleanFunctionCommand::SYMBOLS= {"print", "p"};
 const vector<string> DeleteBooleanFunctionCommand::SYMBOLS = {"delete", "d"};
