@@ -1,24 +1,6 @@
-# CMake temporary files
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-cmake_install.cmake
-install_manifest.txt
-CTestTestfile.cmake
-Makefile
-
 # Output dirs
 out/
 bin/
-release/
-debug/
-
-# Temporary testing dirs
-Testing/
-
-# Any supported IDE or editor dirs
-.idea/
-.vscode/
 
 # macOS files
 .DS_Store
