@@ -104,26 +104,26 @@ The first word in every line of Logic code is a command. Everything that follows
 The list of currently defined commands, their aliases in the parenthesis, and what they do:
 
 * `let` (`l`): Defines a new Boolean function in the current workspace, or overwrites an existing one with the same name.
-* `print` (`p`): If the passed Boolean Function is a constant value function, then prints the constant value. Else, prints the truth table. The header of the truth table is the list of variables in little ending format (highest index variable is the leftmost, lowest is the rightmost).
+* `print` (`p`): If the passed Boolean Function is a constant value function, then prints the constant value. Else, prints the truth table. The header of the truth table is the list of variables in little endian format (highest index variable is the leftmost, lowest is the rightmost).
 *  `delete` (`d`): Deletes the Boolean function with the specified name from the current workspace.
 *  `minterms` (`min`): Prints the minterms of the Boolean function expression passed.
 *  `maxterms` (`max`): Prints the maxterms of the Boolean function expression passed.
-*  `variables` (`v`): Prints the variables that the passed Boolean function is a function of in little ending format (highest index variable is the leftmost, lowest is the rightmost).
+*  `variables` (`v`): Prints the variables that the passed Boolean function is a function of in little endian format (highest index variable is the leftmost, lowest is the rightmost).
 *  `quit` (`q`): In the interactive mode, quits the shell. If used in a script, will stop execution.
 
 ###Operators
-* `$`: Binary operator 'and'
+* `&`: Binary operator 'and'
 * `|`: Binary operator 'or'
 * `^`: Binary opertor 'xor'
 * `!`: Unary operator 'not'
-* `(`, `)`: Parenthesis for specifying operator precedence.
-* `==`: Binary operator 'equals'. This is a special operator, as it takes in two Boolean functions as arguments, and returns a constant value Boolean function holding the value `0` or `1`. See this example for instance:
+* `(`, `)`: Parenthesis for specifying operator precedence
+* `==`: Binary operator 'equals'. It takes in two Boolean functions as arguments, and returns a constant value Boolean function holding the value `0` or `1`. See this example for instance:
 
 ```
-let x = (a & b) | (c | d == 1);
+let x = (a & b) | (c | (d == 1));
 p $x;
 ```
-By the lazy precedence rule (see below), the function `x` can be re-written as `(a & b) | (c | (d == 1))`. Since `d == 1` is the constant value Boolean function `0` (because `d` is _not_ the constant `1` always), and `c | 0 == c`, the result is the function `(a & b) | c`. Thus even though `d` was present in the original expression, the use of the `==` operator eliminated the function `x`'s dependency on `d`. Hence, the output:
+Since `d == 1` is the constant value Boolean function `0` (because `d` is _not_ the constant `1` always), and `c | 0 == c`, the result is the function `(a & b) | (c)`. Thus even though `d` was present in the original expression, the use of the `==` operator eliminated the function `x`'s dependency on `d`. Hence, the output:
 
 ```
 | c | b | a |
@@ -143,7 +143,7 @@ By the lazy precedence rule (see below), the function `x` can be re-written as `
 # Constant function case
 >> let x = 1;
 >> p $x[1000000];
-1 
+1
 
 # Truth table function case
 >> let x = a & b;
@@ -173,7 +173,7 @@ Here, `x` is the function `(a & b) | c`, when `b` is true and `a` is false. That
 | 1 | 1 | 1
 ```
 
-Note: You should always use parenthesis to specify the operator precedence, because there is no agreed upon natural precedence between the different binary operators (unary operators have a natural precedence--they apply to the immediately following operand). For instance: `a | (b & d | !c) & c` can be interpreted as `(a | ((b & d) | !c)) & c` if using _greedy_ precedence, or as `a | ((b & (d | !c)) & c)` if using the _lazy_ precedence.
+Note: You should always use parenthesis to specify the operator precedence, because there is no agreed upon natural precedence between the different binary operators (unary operators have a natural precedence--they apply to the immediately following operand (or preceding, as is the case for the `[]` operator)). For instance: `a | (b & d | !c) & c` can be interpreted as `(a | ((b & d) | !c)) & c` if using _greedy_ precedence, or as `a | ((b & (d | !c)) & c)` if using the _lazy_ precedence.
 The convention here is to use the latter _lazy_ one.
 
 ###Special tokens
