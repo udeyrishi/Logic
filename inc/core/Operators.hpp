@@ -25,11 +25,15 @@
 using namespace std;
 
 namespace Logic {
+static const string NOT_OPERATOR("!");
+static const string AND_OPERATOR("&");
+static const string OR_OPERATOR("|");
+static const string XOR_OPERATOR("^");
 
-static const string NOT_REGEX("[!]");
-static const string AND_REGEX("[&]");
-static const string OR_REGEX("[\\|]");
-static const string XOR_REGEX("[\\^]");
+static const string NOT_REGEX("[" + NOT_OPERATOR +"]");
+static const string AND_REGEX("[" + AND_OPERATOR + "]");
+static const string OR_REGEX("[\\" + OR_OPERATOR + "]");
+static const string XOR_REGEX("[\\" + XOR_OPERATOR + "]");
 static const string EQUALS_REGEX("[=]{2}");
 // The CONDITIONS_REGEX was match the INDEX_REGEX strings as well, so
 // check for the INDEX_REGEX first

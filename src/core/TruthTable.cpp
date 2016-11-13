@@ -58,7 +58,7 @@ bool TruthTable::operator[](const TruthTableUInt index) const {
     return values[index];
 }
 
-vector<TruthTableUInt> TruthTable::getMinterms() {
+vector<TruthTableUInt> TruthTable::getMinterms() const {
     vector<TruthTableUInt> minterms;
     for (TruthTableUInt i = 0; i < size(); ++i) {
         if ((*this)[i]) {
@@ -68,7 +68,7 @@ vector<TruthTableUInt> TruthTable::getMinterms() {
     return minterms;
 }
 
-vector<TruthTableUInt> TruthTable::getMaxterms() {
+vector<TruthTableUInt> TruthTable::getMaxterms() const {
     vector<TruthTableUInt> maxterms;
     for (TruthTableUInt i = 0; i < size(); ++i) {
         if (!(*this)[i]) {

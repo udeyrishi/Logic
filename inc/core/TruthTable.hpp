@@ -45,8 +45,8 @@ public:
 
     TruthTableCondition conditionBuilder() const;
 
-    vector<TruthTableUInt> getMinterms();
-    vector<TruthTableUInt> getMaxterms();
+    vector<TruthTableUInt> getMinterms() const;
+    vector<TruthTableUInt> getMaxterms() const;
 
     static bool getVariableValueInLine(TruthTableVariablesUInt columnNumber, TruthTableUInt lineIndex);
 private:
