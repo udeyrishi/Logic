@@ -18,10 +18,12 @@
 #include <string>
 #include <lang/Interpreter.hpp>
 #include <lang/Runtime.hpp>
+#include <lang/DispatchTable.hpp>
 #include <fstream>
 #include <sstream>
 #include <exception>
 #include <stdlib.h>
+#include <memory>
 
 using namespace Logic;
 using namespace std;
@@ -31,15 +33,17 @@ using namespace std;
     exit(-1);                           \
 }
 
-void printUsage(const char *programName);
-void interpret(Interpreter &interpreter, const bool terminateOnFailure);
+static void printUsage(const char *programName);
+static void interpret(Interpreter &interpreter, const bool terminateOnFailure);
+static DispatchTable createDispatchTable();
 
 int main(int argc, char **argv) {
     Runtime runtime;
+    DispatchTable dispatchTable = createDispatchTable();
 
     if (argc == 1) {
         // Interactive
-        Interpreter interpreter(runtime, cin, cout, true);
+        Interpreter interpreter(runtime, dispatchTable, cin, cout, true);
         interpret(interpreter, false);
 
     } else if (argc == 2) {
@@ -51,7 +55,7 @@ int main(int argc, char **argv) {
             printUsage(argv[0]);
         } else {
             ifstream codeFileStream(path);
-            Interpreter interpreter(runtime, codeFileStream, cout, false);
+            Interpreter interpreter(runtime, dispatchTable, codeFileStream, cout, false);
             interpret(interpreter, true);
         }
     } else if (argc == 3) {
@@ -62,7 +66,7 @@ int main(int argc, char **argv) {
         // Run this code
         stringstream codeStream;
         codeStream << argv[2];
-        Interpreter interpreter(runtime, codeStream, cout, false);
+        Interpreter interpreter(runtime, dispatchTable, codeStream, cout, false);
         interpret(interpreter, true);
 
     } else {
@@ -72,7 +76,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void interpret(Interpreter &interpreter, const bool terminateOnFailure) {
+static void interpret(Interpreter &interpreter, const bool terminateOnFailure) {
     interpreter.start();
     do {
         try {
@@ -84,7 +88,7 @@ void interpret(Interpreter &interpreter, const bool terminateOnFailure) {
     } while (!terminateOnFailure);
 }
 
-void printUsage(const char *programName) {
+static void printUsage(const char *programName) {
     cerr << "Usage: " << endl;
     cerr << "  " << programName << " [options]" << endl;
     cerr << "    options:" << endl;
@@ -92,4 +96,19 @@ void printUsage(const char *programName) {
     cerr << "      [filepath]          : executes the code in the text file located at <filepath>" << endl;
     cerr << "      -c, --code [code]   : executes the code string passed as the command line arg itself" << endl;
     cerr << "      -h, --help          : print this usage info" << endl;
+}
+
+#define REGISTER_COMMAND(COMMAND, ...) \
+    dispatchTable.registerCommand({ __VA_ARGS__ }, []() { return unique_ptr<Command>(new COMMAND##Command()); });
+
+static DispatchTable createDispatchTable() {
+    DispatchTable dispatchTable;
+    REGISTER_COMMAND(CreateBooleanFunction, "let", "l");
+    REGISTER_COMMAND(PrintBooleanFunction, "print", "p");
+    REGISTER_COMMAND(CreateBooleanFunction, "delete", "d");
+    REGISTER_COMMAND(PrintMinterms, "minterms", "min");
+    REGISTER_COMMAND(PrintMaxterms, "maxterms", "max");
+    REGISTER_COMMAND(PrintVariables, "variables", "v");
+    REGISTER_COMMAND(Quit, "quit", "q");
+    return dispatchTable;
 }

@@ -16,7 +16,6 @@
 
 #include <lang/Interpreter.hpp>
 #include <string>
-#include <lang/Command.hpp>
 #include <core/Utils.hpp>
 #include <lang/Exceptions.hpp>
 #include <sstream>
@@ -96,12 +95,9 @@ void Interpreter::run() {
         uint64_t argLocation = 0;
         for (; argLocation < line.length() && !isWhitespace(line.at(argLocation)); ++argLocation);
 
-        string commandString = line.substr(0, argLocation);
+        string commandName = line.substr(0, argLocation);
         string args = trim(line.substr(argLocation, string::npos));
-        Command *command = getCommand(commandString);
-        bool _continue = command->execute(args, runtime, out);
-        delete command;
-        if (!_continue) {
+        if (!dispatchTable.getCommand(commandName)->execute(args, runtime, out)) {
             break;
         }
     }

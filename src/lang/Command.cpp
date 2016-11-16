@@ -26,14 +26,6 @@ using namespace std;
 namespace Logic {
 static const regex CREATE_ARGS_REGEX("\\s*(" + VARIABLE_REGEX + ")\\s*[=]\\s*(.+)\\s*");
 
-const vector<string> CreateBooleanFunctionCommand::SYMBOLS = {"let", "l"};
-const vector<string> PrintBooleanFunctionCommand::SYMBOLS= {"print", "p"};
-const vector<string> DeleteBooleanFunctionCommand::SYMBOLS = {"delete", "d"};
-const vector<string> PrintMintermsCommand::SYMBOLS = {"minterms", "min"};
-const vector<string> PrintMaxtermsCommand::SYMBOLS = {"maxterms", "max"};
-const vector<string> PrintVariablesCommand::SYMBOLS = {"variables", "v"};
-const vector<string> QuitCommand::SYMBOLS = {"quit", "q"};
-
 BooleanFunction parse(const string &expression, const Runtime &runtime) {
     return BooleanFunctionParser().parse(expression, [&](const string &functionName) -> const BooleanFunction& {
         return runtime.get(functionName);
@@ -90,25 +82,5 @@ bool QuitCommand::execute(const string &args, Runtime &runtime, ostream &out) {
         throw BadCommandArgumentsException("Unknown args to command 'quit': " + args);
     }
     return false;
-}
-
-Command *getCommand(const string &command) {
-    if (contains(CreateBooleanFunctionCommand::SYMBOLS, command)) {
-        return new CreateBooleanFunctionCommand();
-    } else if (contains(PrintBooleanFunctionCommand::SYMBOLS, command)) {
-        return new PrintBooleanFunctionCommand();
-    } else if (contains(DeleteBooleanFunctionCommand::SYMBOLS, command)) {
-        return new DeleteBooleanFunctionCommand();
-    } else if (contains(QuitCommand::SYMBOLS, command)) {
-        return new QuitCommand();
-    } else if (contains(PrintMaxtermsCommand::SYMBOLS, command)) {
-        return new PrintMaxtermsCommand();
-    } else if (contains(PrintMintermsCommand::SYMBOLS, command)) {
-        return new PrintMintermsCommand();
-    } else if (contains(PrintVariablesCommand::SYMBOLS, command)) {
-        return new PrintVariablesCommand();
-    }
-
-    throw UnknownCommandException("Unknown command: " + command);
 }
 }

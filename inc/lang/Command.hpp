@@ -18,9 +18,15 @@
 
 #include <string>
 #include <lang/Runtime.hpp>
-#include <iostream>
+#include <ostream>
 
 using namespace std;
+
+#define DECLARE_COMMAND_CLASS(COMMAND_NAME)                               \
+    class COMMAND_NAME##Command : public Command {                        \
+    public:                                                               \
+        virtual bool execute(const string &, Runtime &, ostream &);       \
+    };                                                                    \
 
 namespace Logic {
 class Command {
@@ -30,47 +36,11 @@ public:
     }
 };
 
-class CreateBooleanFunctionCommand : public Command  {
-public:
-    virtual bool execute(const string &args, Runtime &runtime, ostream &out);
-    static const vector<string> SYMBOLS;
-};
-
-class PrintBooleanFunctionCommand : public Command {
-public:
-    virtual bool execute(const string &expression, Runtime &runtime, ostream &out);
-    static const vector<string> SYMBOLS;
-};
-
-class DeleteBooleanFunctionCommand : public Command {
-public:
-    virtual bool execute(const string &functionName, Runtime &runtime, ostream &out);
-    static const vector<string> SYMBOLS;
-};
-
-class PrintMintermsCommand : public Command {
-public:
-    virtual bool execute(const string &expression, Runtime &runtime, ostream &out);
-    static const vector<string> SYMBOLS;
-};
-
-class PrintMaxtermsCommand : public Command {
-public:
-    virtual bool execute(const string &expression, Runtime &runtime, ostream &out);
-    static const vector<string> SYMBOLS;
-};
-
-class PrintVariablesCommand : public Command {
-public:
-    virtual bool execute(const string &expression, Runtime &runtime, ostream &out);
-    static const vector<string> SYMBOLS;
-};
-
-class QuitCommand : public Command {
-public:
-    virtual bool execute(const string &args, Runtime &runtime, ostream &out);
-    static const vector<string> SYMBOLS;
-};
-
-Command *getCommand(const string &command);
+DECLARE_COMMAND_CLASS(CreateBooleanFunction);
+DECLARE_COMMAND_CLASS(PrintBooleanFunction);
+DECLARE_COMMAND_CLASS(DeleteBooleanFunction);
+DECLARE_COMMAND_CLASS(PrintMinterms);
+DECLARE_COMMAND_CLASS(PrintMaxterms);
+DECLARE_COMMAND_CLASS(PrintVariables);
+DECLARE_COMMAND_CLASS(Quit);
 }

@@ -19,6 +19,7 @@
 #include <iostream>
 #include <stdint.h>
 #include <lang/Runtime.hpp>
+#include <lang/DispatchTable.hpp>
 #include <stdexcept>
 #include <core/Utils.hpp>
 
@@ -28,8 +29,8 @@ namespace Logic {
 class Interpreter
 {
 public:
-    Interpreter(Runtime &runtime, istream &in, ostream &out, bool printPrompts=false)
-        : runtime(runtime), in(in), out(out), printPrompts(printPrompts) {
+    Interpreter(Runtime &runtime, DispatchTable &dispatchTable, istream &in, ostream &out, bool printPrompts=false)
+        : runtime(runtime), dispatchTable(dispatchTable), in(in), out(out), printPrompts(printPrompts) {
     }
 
     void start();
@@ -37,12 +38,13 @@ public:
 
 private:
     Runtime &runtime;
+    DispatchTable &dispatchTable;
     istream &in;
     ostream &out;
     const bool printPrompts;
 
     Interpreter(const Interpreter &rhs)
-        : runtime(rhs.runtime), in(rhs.in), out(rhs.out), printPrompts(false) {
+        : runtime(rhs.runtime), dispatchTable(rhs.dispatchTable), in(rhs.in), out(rhs.out), printPrompts(false) {
             throw runtime_error("Copying Interpreter object not allowed.");
     }
 

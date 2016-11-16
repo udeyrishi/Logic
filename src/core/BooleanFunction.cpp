@@ -16,7 +16,7 @@
 
 #include <core/BooleanFunction.hpp>
 #include <core/Exceptions.hpp>
-#include <iostream>
+#include <ostream>
 
 using namespace std;
 
