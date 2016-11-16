@@ -10,6 +10,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Werror -Ws
 # Output vars
 set(CORE_LIB "logic_core")
 set(LANG_LIB "logic_lang")
+set(APP_LIB "logic_app")
 set(TARGET "logic")
 set(TEST_LIB "catch")
 set(TEST_TARGET "logic_tests")
@@ -26,6 +27,7 @@ set(INC_EXT "hpp")
 set(MAIN_CPP "Main.cpp")
 set(CORE_MODULE "core")
 set(LANG_MODULE "lang")
+set(APP_MODULE "app")
 
 # The core library
 file(GLOB_RECURSE CORE_LIB_SOURCES ${SRC_DIR}/${CORE_MODULE}/*.${SRC_EXT})
@@ -37,10 +39,16 @@ add_library(${LANG_LIB} STATIC ${LANG_LIB_SOURCES})
 # lang lib depends on core
 target_link_libraries(${LANG_LIB} ${CORE_LIB})
 
+# The app library
+file(GLOB_RECURSE APP_LIB_SOURCES ${SRC_DIR}/${APP_MODULE}/*.${SRC_EXT})
+add_library(${APP_LIB} STATIC ${APP_LIB_SOURCES})
+# app lib depends on lang
+target_link_libraries(${APP_LIB} ${LANG_LIB})
+
 # The main binary
 add_executable(${TARGET} ${SRC_DIR}/${MAIN_CPP})
 include_directories(${INC_DIR})
-target_link_libraries(${TARGET} ${LANG_LIB})
+target_link_libraries(${TARGET} ${APP_LIB})
 
 # The Catch testing library
 add_library(${TEST_LIB} INTERFACE)

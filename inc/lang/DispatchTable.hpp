@@ -34,4 +34,6 @@ public:
 private:
     unordered_map<string, function<unique_ptr<Command> ()>> table;
 };
+
+DispatchTable createDispatchTableWithAllCommands();
 }

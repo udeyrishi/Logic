@@ -33,4 +33,20 @@ unique_ptr<Command> DispatchTable::getCommand(const string &token) {
     }
     return search->second();
 }
+
+#define REGISTER_COMMAND(COMMAND, ...) \
+    dispatchTable.registerCommand({ __VA_ARGS__ }, []() { return unique_ptr<Command>(new COMMAND##Command()); });
+
+DispatchTable createDispatchTableWithAllCommands() {
+    DispatchTable dispatchTable;
+    REGISTER_COMMAND(CreateBooleanFunction, "let", "l");
+    REGISTER_COMMAND(PrintBooleanFunction, "print", "p");
+    REGISTER_COMMAND(DeleteBooleanFunction, "delete", "d");
+    REGISTER_COMMAND(PrintMinterms, "minterms", "min");
+    REGISTER_COMMAND(PrintMaxterms, "maxterms", "max");
+    REGISTER_COMMAND(PrintVariables, "variables", "v");
+    REGISTER_COMMAND(Quit, "quit", "q");
+    return dispatchTable;
+}
+
 }

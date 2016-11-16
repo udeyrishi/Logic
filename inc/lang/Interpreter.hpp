@@ -29,7 +29,7 @@ namespace Logic {
 class Interpreter
 {
 public:
-    Interpreter(Runtime &runtime, DispatchTable &dispatchTable, istream &in, ostream &out, bool printPrompts=false)
+    Interpreter(Runtime &runtime, DispatchTable &dispatchTable, istream &in, ostream &out, const bool printPrompts)
         : runtime(runtime), dispatchTable(dispatchTable), in(in), out(out), printPrompts(printPrompts) {
     }
 
@@ -44,7 +44,7 @@ private:
     const bool printPrompts;
 
     Interpreter(const Interpreter &rhs)
-        : runtime(rhs.runtime), dispatchTable(rhs.dispatchTable), in(rhs.in), out(rhs.out), printPrompts(false) {
+        : runtime(rhs.runtime), dispatchTable(rhs.dispatchTable), in(rhs.in), out(rhs.out), printPrompts(rhs.printPrompts) {
             throw runtime_error("Copying Interpreter object not allowed.");
     }
 
