@@ -23,10 +23,10 @@
 using namespace std;
 
 #define DECLARE_COMMAND_CLASS(COMMAND_NAME)                               \
-    class COMMAND_NAME##Command : public Command {                        \
-    public:                                                               \
-        virtual bool execute(const string &, Runtime &, ostream &);       \
-    };                                                                    \
+class COMMAND_NAME##Command : public Command {                            \
+public:                                                                   \
+    virtual bool execute(const string &, Runtime &, ostream &);           \
+}
 
 namespace Logic {
 class Command {
