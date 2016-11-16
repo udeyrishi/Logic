@@ -38,7 +38,7 @@ static const string EQUALS_REGEX("[=]{2}");
 // The CONDITIONS_REGEX was match the INDEX_REGEX strings as well, so
 // check for the INDEX_REGEX first
 static const string INDEX_REGEX("[\\[]{1}[\\s]*([\\d]+)[\\s]*[\\]]{1}");
-static const string CONDITIONS_REGEX("[\\[]{1}[\\s]*(.+)[\\s]*[\\]]{1}");
+static const string CONDITIONS_REGEX("[\\[]{1}[\\s]*(.+?)[\\s]*[\\]]{1}");
 static const vector<string> OPERATOR_REGEXES({
                                           NOT_REGEX,
                                           AND_REGEX,
