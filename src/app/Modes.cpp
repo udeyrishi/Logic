@@ -74,13 +74,14 @@ unique_ptr<Mode> getMode(const int argc, const char * const *argv) {
         }
     } else if (argc == 3) {
         string option = argv[1];
-        if (option != "-c" && option != "--code") {
+        if (option == "-c" || option == "--code") {
+            // Run this code
+            stringstream *codeStream = new stringstream();
+            (*codeStream) << argv[2];
+            mode = new CodeExecutionMode({ true, true, false }, codeStream);
+        } else {
             mode = new HelpMode(-1, argv[0]);
         }
-        // Run this code
-        stringstream *codeStream = new stringstream();
-        (*codeStream) << argv[2];
-        mode = new CodeExecutionMode({ true, true, false }, codeStream);
     } else {
         mode = new HelpMode(-1, argv[0]);
     }
