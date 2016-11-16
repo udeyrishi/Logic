@@ -39,6 +39,7 @@ unique_ptr<Command> DispatchTable::getCommand(const string &token) {
 
 DispatchTable createDispatchTableWithAllCommands() {
     DispatchTable dispatchTable;
+    // See lang/Command.hpp for the list of available commands
     REGISTER_COMMAND(CreateBooleanFunction, "let", "l");
     REGISTER_COMMAND(PrintBooleanFunction, "print", "p");
     REGISTER_COMMAND(DeleteBooleanFunction, "delete", "d");

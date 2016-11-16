@@ -1,9 +1,7 @@
 # Logic
 [![Build Status](https://travis-ci.com/udeyrishi/Logic.svg?token=ez7psV6XvuSyQ3hU3b5M&branch=master)](https://travis-ci.com/udeyrishi/Logic)
 
-Logic is a simple language(-ish)/tool for doing Boolean Function manipulations. It is also a C++ library for doing these manipulations in your own application (the `core` module inside).
-
-This has been tested to work on macOS and Linux. _Should_ work on Windows as well, but hasn't been tested yet. The following building and running guides are written with macOS and Linux in mind, but it should be easy to adapt these to Windows.
+Logic is a domain specific scripting language/tool for doing Boolean Function manipulations. It is also a C++ library for doing these manipulations in your own application (the `core` module inside).
 
 ##Building
 
@@ -218,10 +216,10 @@ Here, even though the value of the Boolean function named `x` is changed later t
 Also note that the `$` has the highest precedence. For instance, in the above example, the value of `x` is first computed, and then xor-ed with `c` to get the Boolean function for `y`. So, the equivalent definition would be `let y = (a & b) ^ c;` (and not `a & (b ^ c)`, which would've been the case if you went `let y = a & b ^ c`).
 
 #### `;` (the semi-colon sign):
-Marks the end of line of code. The first whitespace separated word between two successive `;` will be interpreted as the command, and everything else will be passed as the arguments to that command.
+Marks the end of line of code. The first whitespace (if any) separated word between two successive `;` will be interpreted as the command, and everything else will be passed as the arguments to that command.
 
 #### `#` (the pound sign):
-A comment line.
+Everything that follows until a new line is a comment.
 
 ---
-Congrats, you made it through! I'll be adding more features, and keeping this Readme updated. If you have a suggestion, leave an issue. If you have an improvement, leave a PR.
+Congrats, you made it through! I'll be adding more features, and keeping this Readme updated. If you have any suggestions and/or improvements, please leave an issue or submit a PR.
