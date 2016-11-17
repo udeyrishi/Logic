@@ -20,23 +20,16 @@
 
 using namespace std;
 
+#define DECLARE_LOGIC_EXCEPTION(NAME)                                       \
+class NAME##Exception : public LogicException {                             \
+public:                                                                     \
+    NAME##Exception(const string &message) : LogicException(message) {      \
+    }                                                                       \
+}
+
 namespace Logic {
-class UnknownCommandException : public LogicException {
-public:
-    UnknownCommandException(const string &message) : LogicException(message) {
-    }
-};
-
-class BadCommandArgumentsException : public LogicException {
-public:
-    BadCommandArgumentsException(const string &message) : LogicException(message) {
-    }
-};
-
-class UnexpectedEOFException : public LogicException {
-public:
-    UnexpectedEOFException(const string &message) : LogicException(message) {
-    }
-};
-
+DECLARE_LOGIC_EXCEPTION(UnknownCommand);
+DECLARE_LOGIC_EXCEPTION(CommandNotAllowed);
+DECLARE_LOGIC_EXCEPTION(BadCommandArguments);
+DECLARE_LOGIC_EXCEPTION(UnexpectedEOF);
 }

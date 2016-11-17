@@ -20,19 +20,24 @@
 #include <core/BooleanFunction.hpp>
 #include <core/Utils.hpp>
 #include <unordered_map>
+#include <unordered_set>
 
 using namespace std;
 
 namespace Logic {
-class Runtime
-{
+class Runtime {
 public:
     void save(const string &variableName, const BooleanFunction &function);
     BooleanFunction &get(const string &variableName);
     const BooleanFunction &get(const string &variableName) const;
     bool contains(const string &variableName) const;
     void erase(const string &variableName);
+
+    void flag(const string &flagName);
+    bool getFlag(const string &flagName);
+    void clearFlags();
 private:
     unordered_map<string, BooleanFunction> workspace;
+    unordered_set<string> flags;
 };
 }

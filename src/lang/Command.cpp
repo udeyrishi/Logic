@@ -27,6 +27,8 @@ using namespace std;
 
 namespace Logic {
 static const regex CREATE_ARGS_REGEX("\\s*(" + VARIABLE_REGEX + ")\\s*[=]\\s*(.+)\\s*");
+static const string ELSE_ALLOWED = "else_allowed";
+static const string RUN_ELSE = "run_else";
 
 BooleanFunction parse(const string &expression, const Runtime &runtime) {
     return BooleanFunctionParser().parse(expression, [&](const string &functionName) -> const BooleanFunction& {
@@ -34,7 +36,16 @@ BooleanFunction parse(const string &expression, const Runtime &runtime) {
     });
 }
 
+bool Command::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    UNUSED(args);
+    UNUSED(out);
+    UNUSED(interpreter);
+    runtime.clearFlags();
+    return true;
+}
+
 bool QuitCommand::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    Command::execute(args, runtime, out, interpreter);
     UNUSED(out);
     UNUSED(runtime);
     UNUSED(interpreter);
@@ -46,6 +57,7 @@ bool QuitCommand::execute(const string &args, Runtime &runtime, ostream &out, fu
 }
 
 bool CreateBooleanFunctionCommand::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    Command::execute(args, runtime, out, interpreter);
     UNUSED(out);
     UNUSED(interpreter);
 
@@ -61,6 +73,7 @@ bool CreateBooleanFunctionCommand::execute(const string &args, Runtime &runtime,
 }
 
 bool PrintBooleanFunctionCommand::execute(const string &expression, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    Command::execute(expression, runtime, out, interpreter);
     UNUSED(interpreter);
 
     out << parse(expression, runtime) << endl;
@@ -68,14 +81,16 @@ bool PrintBooleanFunctionCommand::execute(const string &expression, Runtime &run
 }
 
 bool DeleteBooleanFunctionCommand::execute(const string &functionName, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    Command::execute(functionName, runtime, out, interpreter);
     UNUSED(interpreter);
-
     UNUSED(out);
+
     runtime.erase(functionName);
     return true;
 }
 
 bool PrintMaxtermsCommand::execute(const string &expression, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    Command::execute(expression, runtime, out, interpreter);
     UNUSED(interpreter);
 
     out << join(parse(expression, runtime).getTruthTable().getMaxterms(), ", ") << endl;
@@ -83,6 +98,7 @@ bool PrintMaxtermsCommand::execute(const string &expression, Runtime &runtime, o
 }
 
 bool PrintMintermsCommand::execute(const string &expression, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    Command::execute(expression, runtime, out, interpreter);
     UNUSED(interpreter);
 
     out << join(parse(expression, runtime).getTruthTable().getMinterms(), ", ") << endl;
@@ -90,6 +106,7 @@ bool PrintMintermsCommand::execute(const string &expression, Runtime &runtime, o
 }
 
 bool PrintVariablesCommand::execute(const string &expression, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    Command::execute(expression, runtime, out, interpreter);
     UNUSED(interpreter);
 
     vector<string> variables = parse(expression, runtime).getTruthTable().getVariables();
@@ -99,7 +116,7 @@ bool PrintVariablesCommand::execute(const string &expression, Runtime &runtime, 
     return true;
 }
 
-static pair<const string, const string> parseScopeCommandArgs(const string &args, const string &commandName) {
+static pair<string, string> getConditionalCommandArgs(const string &args, const string &commandName) {
     static const regex conditionRegex("[\\s]*(.+?)[\\s]*[\\{]{1}[\\s]*(.+)[\\s]*[\\}]{1}");
     smatch sm;
 
@@ -111,29 +128,36 @@ static pair<const string, const string> parseScopeCommandArgs(const string &args
 }
 
 bool IfCommand::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    Command::execute(args, runtime, out, interpreter);
     UNUSED(out);
-    const auto scopeCommandArgs = parseScopeCommandArgs(args, "if");
 
-    BooleanFunction conditionFunction = parse(scopeCommandArgs.first, runtime);
+    const auto parsedArgs = getConditionalCommandArgs(args, "if");
+    BooleanFunction conditionFunction = parse(parsedArgs.first, runtime);
     if (!conditionFunction.isConstant()) {
         throw BadCommandArgumentsException("The condition to the 'if' command needs to evaluate to a constant value Boolean function.");
     }
 
+    bool _continue = true;
     if (conditionFunction.getConstantValue()) {
         stringstream ss;
-        ss << scopeCommandArgs.second;
-        return interpreter(ss);
+        ss << parsedArgs.second;
+        _continue = interpreter(ss);
+    } else {
+        runtime.flag(RUN_ELSE);
     }
 
-    return true;
+    runtime.flag(ELSE_ALLOWED);
+    return _continue;
 }
 
 bool WhileCommand::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    Command::execute(args, runtime, out, interpreter);
     UNUSED(out);
-    const auto scopeCommandArgs = parseScopeCommandArgs(args, "while");
+
+    const auto parsedArgs = getConditionalCommandArgs(args, "while");
 
     while (true) {
-        BooleanFunction conditionFunction = parse(scopeCommandArgs.first, runtime);
+        BooleanFunction conditionFunction = parse(parsedArgs.first, runtime);
         if (!conditionFunction.isConstant()) {
             throw BadCommandArgumentsException("The condition to the 'while' command needs to evaluate to a constant value Boolean function.");
         }
@@ -143,12 +167,43 @@ bool WhileCommand::execute(const string &args, Runtime &runtime, ostream &out, f
         }
 
         stringstream ss;
-        ss << scopeCommandArgs.second;
+        ss << parsedArgs.second;
         if (!interpreter(ss)) {
             return false;
         }
     }
 
     return true;
+}
+
+bool ElseCommand::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    if (!runtime.getFlag(ELSE_ALLOWED)) {
+        throw CommandNotAllowedException("'else' command cannot be used without a preceding 'if' command.");
+    }
+
+    if (!runtime.getFlag(RUN_ELSE)) {
+        return true;
+    }
+
+    Command::execute(args, runtime, out, interpreter);
+    UNUSED(out);
+
+    static const regex conditionRegex("[\\s]*(.*?)[\\s]*[\\{]{1}[\\s]*(.+)[\\s]*[\\}]{1}");
+    smatch sm;
+
+    if (!regex_search(args, sm, conditionRegex, regex_constants::match_continuous)) {
+        throw BadCommandArgumentsException("Unknown args to command 'else': " + args);
+    }
+
+    const string condition = sm[1];
+    const string code = sm[2];
+
+    if (isWhitespace(condition)) {
+        stringstream ss;
+        ss << code;
+        return interpreter(ss);
+    } else {
+        throw BadCommandArgumentsException("Else if conditions are coming soon");
+    }
 }
 }

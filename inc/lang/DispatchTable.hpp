@@ -49,6 +49,7 @@ inline DispatchTable createDispatchTableWithAllCommands() {
     REGISTER_COMMAND(PrintMaxterms, "maxterms", "max");
     REGISTER_COMMAND(PrintVariables, "variables", "v");
     REGISTER_COMMAND(If, "if");
+    REGISTER_COMMAND(Else, "else");
     REGISTER_COMMAND(While, "while");
     return dispatchTable;
 }
