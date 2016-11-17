@@ -3,7 +3,8 @@
 
 Logic is a domain specific scripting language/tool for doing Boolean Function manipulations. It is also a C++ library for doing these manipulations in your own application (the `core` module inside).
 
-##Building
+
+##Building and Installing
 
 Requirements:
 
@@ -13,7 +14,13 @@ Requirements:
 	* Linux with clang++ 3.6+
 * cmake
 * make
-* [Optional] Python
+
+```sh
+# To install logic in /usr/local/bin
+./install.sh
+```
+
+Or, to just build:
 
 ```sh
 # This will put the binaries in ./bin
@@ -21,11 +28,6 @@ cmake . && make logic
 
 # To compile the logic_tests executable
 cmake . && make logic_tests
-
-# Or to do everything, use this handy script.
-# Use flag -d for the debug version
-# This will output to the ./out/release/bin (or ./out/debug/bin) directory
-./build.py
 ```
 
 ##Running
