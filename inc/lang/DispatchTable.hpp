@@ -35,5 +35,19 @@ private:
     unordered_map<string, function<unique_ptr<Command> ()>> table;
 };
 
-DispatchTable createDispatchTableWithAllCommands();
+#define REGISTER_COMMAND(COMMAND, ...) \
+    dispatchTable.registerCommand({ __VA_ARGS__ }, []() { return unique_ptr<Command>(new COMMAND##Command()); });
+
+inline DispatchTable createDispatchTableWithAllCommands() {
+    DispatchTable dispatchTable;
+    // See lang/Command.hpp for the list of available commands
+    REGISTER_COMMAND(CreateBooleanFunction, "let", "l");
+    REGISTER_COMMAND(PrintBooleanFunction, "print", "p");
+    REGISTER_COMMAND(DeleteBooleanFunction, "delete", "d");
+    REGISTER_COMMAND(PrintMinterms, "minterms", "min");
+    REGISTER_COMMAND(PrintMaxterms, "maxterms", "max");
+    REGISTER_COMMAND(PrintVariables, "variables", "v");
+    REGISTER_COMMAND(Quit, "quit", "q");
+    return dispatchTable;
+}
 }
