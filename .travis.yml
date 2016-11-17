@@ -80,5 +80,3 @@ script:
   - ./build.py -d
   - ./out/debug/bin/logic_tests -d yes --order rand
   - ./out/release/bin/logic_tests -d yes --order rand
-  # Check if the installation script works
-  - sudo ./install.sh && logic -c "p 1;"
