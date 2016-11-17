@@ -21,6 +21,7 @@
 #include <core/Utils.hpp>
 #include <algorithm>
 #include <sstream>
+#include <utility>
 
 using namespace std;
 
@@ -98,27 +99,54 @@ bool PrintVariablesCommand::execute(const string &expression, Runtime &runtime, 
     return true;
 }
 
-bool IfCommand::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
-    UNUSED(out);
-
-    regex conditionRegex("[\\s]*(.+?)[\\s]*[\\{]{1}[\\s]*(.+)[\\s]*[\\}]{1}");
+static pair<const string, const string> parseScopeCommandArgs(const string &args, const string &commandName) {
+    static const regex conditionRegex("[\\s]*(.+?)[\\s]*[\\{]{1}[\\s]*(.+)[\\s]*[\\}]{1}");
     smatch sm;
 
     if (!regex_search(args, sm, conditionRegex, regex_constants::match_continuous)) {
-        throw BadCommandArgumentsException("Unknown args to command 'if': " + args);
+        throw BadCommandArgumentsException("Unknown args to command '" + commandName + "': " + args);
     }
 
-    const string condition = sm[1];
-    const string conditionCode = sm[2];
-    BooleanFunction conditionFunction = parse(condition, runtime);
+    return make_pair(sm[1], sm[2]);
+}
+
+bool IfCommand::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    UNUSED(out);
+    const auto scopeCommandArgs = parseScopeCommandArgs(args, "if");
+
+    BooleanFunction conditionFunction = parse(scopeCommandArgs.first, runtime);
     if (!conditionFunction.isConstant()) {
         throw BadCommandArgumentsException("The condition to the 'if' command needs to evaluate to a constant value Boolean function.");
     }
 
     if (conditionFunction.getConstantValue()) {
         stringstream ss;
-        ss << conditionCode;
+        ss << scopeCommandArgs.second;
         return interpreter(ss);
+    }
+
+    return true;
+}
+
+bool WhileCommand::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    UNUSED(out);
+    const auto scopeCommandArgs = parseScopeCommandArgs(args, "while");
+
+    while (true) {
+        BooleanFunction conditionFunction = parse(scopeCommandArgs.first, runtime);
+        if (!conditionFunction.isConstant()) {
+            throw BadCommandArgumentsException("The condition to the 'while' command needs to evaluate to a constant value Boolean function.");
+        }
+
+        if (!conditionFunction.getConstantValue()) {
+            break;
+        }
+
+        stringstream ss;
+        ss << scopeCommandArgs.second;
+        if (!interpreter(ss)) {
+            return false;
+        }
     }
 
     return true;

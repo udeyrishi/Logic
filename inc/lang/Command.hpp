@@ -45,6 +45,7 @@ DECLARE_COMMAND_CLASS(PrintMinterms);
 DECLARE_COMMAND_CLASS(PrintMaxterms);
 DECLARE_COMMAND_CLASS(PrintVariables);
 DECLARE_COMMAND_CLASS(If);
+DECLARE_COMMAND_CLASS(While);
 // When adding new commands, update createDispatchTableWithAllCommands() in DispatchTable.hpp
 // to ensure that the command is available at runtime.
 }
