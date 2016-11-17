@@ -25,8 +25,8 @@ using namespace std;
 namespace Logic {
 static constexpr char DELIMITER = ';';
 static constexpr char COMMMENT_TOKEN = '#';
-static constexpr char SCOPE_OPEN = '{';
-static constexpr char SCOPE_CLOSE = '}';
+static constexpr char BLOCK_OPEN = '{';
+static constexpr char BLOCK_CLOSE = '}';
 
 static void clearStringStream(stringstream &ss) {
     ss.str(string());
@@ -65,14 +65,14 @@ string Interpreter::nextLine(istream &in) {
         }
 
         if (!commentOngoing) {
-            if (c == SCOPE_OPEN) {
+            if (c == BLOCK_OPEN) {
                 ++scopeCount;
                 input << c;
-            } else if (c == SCOPE_CLOSE) {
+            } else if (c == BLOCK_CLOSE) {
                 --scopeCount;
                 input << c;
                 if (scopeCount == 0) {
-                    // No need for explicit ';' when ending scope
+                    // No need for explicit ';' when ending block
                     return trim(input.str());
                 }
             } else if (c == DELIMITER && scopeCount == 0) {

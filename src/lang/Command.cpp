@@ -116,8 +116,10 @@ bool PrintVariablesCommand::execute(const string &expression, Runtime &runtime, 
     return true;
 }
 
+static const string BLOCK_REGEX = "[\\s]*[\\{]{1}[\\s]*(.*)[\\s]*[\\}]{1}[\\s]*";
+
 static pair<string, string> getConditionalCommandArgs(const string &args, const string &commandName) {
-    static const regex conditionRegex("[\\s]*(.+?)[\\s]*[\\{]{1}[\\s]*(.+)[\\s]*[\\}]{1}");
+    static const regex conditionRegex("[\\s]*(.+?)[\\s]*" + BLOCK_REGEX);
     smatch sm;
 
     if (!regex_search(args, sm, conditionRegex, regex_constants::match_continuous)) {
@@ -188,7 +190,7 @@ bool ElseCommand::execute(const string &args, Runtime &runtime, ostream &out, fu
     Command::execute(args, runtime, out, interpreter);
     UNUSED(out);
 
-    static const regex conditionRegex("[\\s]*(.*?)[\\s]*[\\{]{1}[\\s]*(.+)[\\s]*[\\}]{1}");
+    static const regex conditionRegex("[\\s]*(.*?)[\\s]*" + BLOCK_REGEX);
     smatch sm;
 
     if (!regex_search(args, sm, conditionRegex, regex_constants::match_continuous)) {
