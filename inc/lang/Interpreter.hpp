@@ -55,5 +55,6 @@ private:
 
     string nextLine(istream &in);
     void printPromptsIfNeeded();
+    bool executeCode(istream &in);
 };
 }

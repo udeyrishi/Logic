@@ -18,31 +18,33 @@
 
 #include <string>
 #include <lang/Runtime.hpp>
-#include <ostream>
+#include <iostream>
+#include <functional>
 
 using namespace std;
 
-#define DECLARE_COMMAND_CLASS(COMMAND_NAME)                               \
-class COMMAND_NAME##Command : public Command {                            \
-public:                                                                   \
-    virtual bool execute(const string &, Runtime &, ostream &);           \
+#define DECLARE_COMMAND_CLASS(COMMAND_NAME)                                                       \
+class COMMAND_NAME##Command : public Command {                                                    \
+public:                                                                                           \
+    virtual bool execute(const string &, Runtime &, ostream &, function<bool (istream &)>);           \
 }
 
 namespace Logic {
 class Command {
 public:
-    virtual bool execute(const string &args, Runtime &runtime, ostream &out) = 0;
+    virtual bool execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) = 0;
     virtual ~Command() {
     }
 };
 
+DECLARE_COMMAND_CLASS(Quit);
 DECLARE_COMMAND_CLASS(CreateBooleanFunction);
 DECLARE_COMMAND_CLASS(PrintBooleanFunction);
 DECLARE_COMMAND_CLASS(DeleteBooleanFunction);
 DECLARE_COMMAND_CLASS(PrintMinterms);
 DECLARE_COMMAND_CLASS(PrintMaxterms);
 DECLARE_COMMAND_CLASS(PrintVariables);
-DECLARE_COMMAND_CLASS(Quit);
+DECLARE_COMMAND_CLASS(If);
 // When adding new commands, update createDispatchTableWithAllCommands() in DispatchTable.hpp
 // to ensure that the command is available at runtime.
 }

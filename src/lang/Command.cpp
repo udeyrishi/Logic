@@ -20,6 +20,7 @@
 #include <lang/Exceptions.hpp>
 #include <core/Utils.hpp>
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -32,8 +33,20 @@ BooleanFunction parse(const string &expression, const Runtime &runtime) {
     });
 }
 
-bool CreateBooleanFunctionCommand::execute(const string &args, Runtime &runtime, ostream &out) {
+bool QuitCommand::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
     UNUSED(out);
+    UNUSED(runtime);
+    UNUSED(interpreter);
+
+    if (args.length() != 0) {
+        throw BadCommandArgumentsException("Unknown args to command 'quit': " + args);
+    }
+    return false;
+}
+
+bool CreateBooleanFunctionCommand::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    UNUSED(out);
+    UNUSED(interpreter);
 
     smatch sm;
     if (regex_match(args, sm, CREATE_ARGS_REGEX, regex_constants::match_continuous)) {
@@ -46,28 +59,38 @@ bool CreateBooleanFunctionCommand::execute(const string &args, Runtime &runtime,
     throw BadCommandArgumentsException("Unknown args to command 'let': " + args);
 }
 
-bool PrintBooleanFunctionCommand::execute(const string &expression, Runtime &runtime, ostream &out) {
+bool PrintBooleanFunctionCommand::execute(const string &expression, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    UNUSED(interpreter);
+
     out << parse(expression, runtime) << endl;
     return true;
 }
 
-bool DeleteBooleanFunctionCommand::execute(const string &functionName, Runtime &runtime, ostream &out) {
+bool DeleteBooleanFunctionCommand::execute(const string &functionName, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    UNUSED(interpreter);
+
     UNUSED(out);
     runtime.erase(functionName);
     return true;
 }
 
-bool PrintMaxtermsCommand::execute(const string &expression, Runtime &runtime, ostream &out) {
+bool PrintMaxtermsCommand::execute(const string &expression, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    UNUSED(interpreter);
+
     out << join(parse(expression, runtime).getTruthTable().getMaxterms(), ", ") << endl;
     return true;
 }
 
-bool PrintMintermsCommand::execute(const string &expression, Runtime &runtime, ostream &out) {
+bool PrintMintermsCommand::execute(const string &expression, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    UNUSED(interpreter);
+
     out << join(parse(expression, runtime).getTruthTable().getMinterms(), ", ") << endl;
     return true;
 }
 
-bool PrintVariablesCommand::execute(const string &expression, Runtime &runtime, ostream &out) {
+bool PrintVariablesCommand::execute(const string &expression, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+    UNUSED(interpreter);
+
     vector<string> variables = parse(expression, runtime).getTruthTable().getVariables();
     // This is how the variables are shown in the truth table -- little endian
     reverse(variables.begin(), variables.end());
@@ -75,12 +98,29 @@ bool PrintVariablesCommand::execute(const string &expression, Runtime &runtime, 
     return true;
 }
 
-bool QuitCommand::execute(const string &args, Runtime &runtime, ostream &out) {
+bool IfCommand::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
     UNUSED(out);
-    UNUSED(runtime);
-    if (args.length() != 0) {
-        throw BadCommandArgumentsException("Unknown args to command 'quit': " + args);
+
+    regex conditionRegex("[\\s]*(.+?)[\\s]*[\\{]{1}[\\s]*(.+)[\\s]*[\\}]{1}");
+    smatch sm;
+
+    if (!regex_search(args, sm, conditionRegex, regex_constants::match_continuous)) {
+        throw BadCommandArgumentsException("Unknown args to command 'if': " + args);
     }
-    return false;
+
+    const string condition = sm[1];
+    const string conditionCode = sm[2];
+    BooleanFunction conditionFunction = parse(condition, runtime);
+    if (!conditionFunction.isConstant()) {
+        throw BadCommandArgumentsException("The condition to the 'if' command needs to evaluate to a constant value Boolean function.");
+    }
+
+    if (conditionFunction.getConstantValue()) {
+        stringstream ss;
+        ss << conditionCode;
+        return interpreter(ss);
+    }
+
+    return true;
 }
 }

@@ -25,6 +25,8 @@ using namespace std;
 namespace Logic {
 static constexpr char DELIMITER = ';';
 static constexpr char COMMMENT_TOKEN = '#';
+static constexpr char SCOPE_OPEN = '{';
+static constexpr char SCOPE_CLOSE = '}';
 
 static void clearStringStream(stringstream &ss) {
     ss.str(string());
@@ -41,6 +43,7 @@ void Interpreter::printPromptsIfNeeded() {
 string Interpreter::nextLine(istream &in) {
     stringstream input;
     bool commentOngoing = false;
+    int scopeCount = 0;
     char c;
     while ((c = (char) in.get()) != char_traits<char>::eof()) {
         if (c == '\r') {
@@ -62,7 +65,17 @@ string Interpreter::nextLine(istream &in) {
         }
 
         if (!commentOngoing) {
-            if (c == DELIMITER) {
+            if (c == SCOPE_OPEN) {
+                ++scopeCount;
+                input << c;
+            } else if (c == SCOPE_CLOSE) {
+                --scopeCount;
+                input << c;
+                if (scopeCount == 0) {
+                    // No need for explicit ';' when ending scope
+                    return trim(input.str());
+                }
+            } else if (c == DELIMITER && scopeCount == 0) {
                 string stringInput = trim(input.str());
                 if (stringInput.length() == 0) {
                     clearStringStream(input);
@@ -89,7 +102,7 @@ void Interpreter::start() {
     printPromptsIfNeeded();
 }
 
-void Interpreter::run() {
+bool Interpreter::executeCode(istream &in) {
     string line;
     while ((line = nextLine(in)).length() > 0) {
         uint64_t argLocation = 0;
@@ -97,9 +110,14 @@ void Interpreter::run() {
 
         string commandName = line.substr(0, argLocation);
         string args = trim(line.substr(argLocation, string::npos));
-        if (!dispatchTable.getCommand(commandName)->execute(args, runtime, out)) {
-            break;
+        if (!dispatchTable.getCommand(commandName)->execute(args, runtime, out, [&](istream &in) { return executeCode(in); })) {
+            return false;
         }
     }
+    return true;
+}
+
+void Interpreter::run() {
+    executeCode(this->in);
 }
 }
