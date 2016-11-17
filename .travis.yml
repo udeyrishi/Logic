@@ -81,4 +81,4 @@ script:
   - ./out/debug/bin/logic_tests -d yes --order rand
   - ./out/release/bin/logic_tests -d yes --order rand
   # Check if the installation script works
-  - ./install.sh && logic -c "p 1;"
+  - sudo ./install.sh && logic -c "p 1;"
