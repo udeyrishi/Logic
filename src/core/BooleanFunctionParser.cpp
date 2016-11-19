@@ -36,7 +36,7 @@ static T topAndPop(stack<T> &_stack) {
 }
 
 namespace Logic {
-static const string VARIABLE_REGEX_WITH_REF = "[\\$]?" + VARIABLE_REGEX;
+static const string BOOLEAN_FUNCTION_REGEX = "[0]{1}|[1]{1}|[\\$]?" + VARIABLE_REGEX;
 
 static string getInfixTokensRegex() {
     static string result;
@@ -45,9 +45,7 @@ static string getInfixTokensRegex() {
         vector<string> tokens = OPERATOR_REGEXES;
         tokens.push_back("[\\(]");
         tokens.push_back("[\\)]");
-        tokens.push_back(VARIABLE_REGEX_WITH_REF);
-        tokens.push_back("[1]");
-        tokens.push_back("[0]");
+        tokens.push_back(BOOLEAN_FUNCTION_REGEX);
         result = "[\\s]*(" + // Optional leading spaces
                  join(tokens, "|") + // actual token regex
                  ")[\\s]*"; // optional trailing spaces
@@ -98,7 +96,7 @@ static vector<string> getInfixTokens(const string &function) {
     while (i < function.length() && regex_search((substring = function.substr(i, string::npos)), sm, tokensRegex, regex_constants::match_continuous)) {
         // Index 1 => The first group in the regex
         string token = sm[1];
-        if (regex_match(token, regex(VARIABLE_REGEX_WITH_REF))) {
+        if (regex_match(token, regex(BOOLEAN_FUNCTION_REGEX))) {
             // Surround by parenthesis, so that the unary operators are properly applied
             tokens.push_back("(");
             tokens.push_back(token);

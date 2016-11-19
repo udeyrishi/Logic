@@ -37,6 +37,11 @@ fi
 TEMP_BUILD_DIR=".__1122temp__logic_dir__1122"
 BINARY_NAME="logic"
 BUILD_PATH="./$TEMP_BUILD_DIR/bin/$BINARY_NAME"
+if [ -z "$COMPILER" ]; then
+    COMPILER_ARG=""
+else
+    COMPILER_ARG="-DCMAKE_CXX_COMPILER=$COMPILER"
+fi
 
 # Build
 if mkdir -p $TEMP_BUILD_DIR ; then
@@ -46,7 +51,7 @@ else
     exit -1
 fi
 
-if ! (cmake .. -DCMAKE_BUILD_TYPE=$BUILD_FLAVOUR && make $BINARY_NAME) ; then
+if ! (cmake -DCMAKE_BUILD_TYPE=$BUILD_FLAVOUR $COMPILER_ARG .. && make $BINARY_NAME) ; then
     echo "Build failed. Quitting installation."
     rm -rf $TEMP_BUILD_DIR
     exit -1
