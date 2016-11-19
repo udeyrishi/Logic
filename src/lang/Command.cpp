@@ -144,6 +144,8 @@ bool IfCommand::execute(const string &args, Runtime &runtime, ostream &out, func
         stringstream ss;
         ss << parsedArgs.second;
         _continue = interpreter(ss);
+        // A nested if condition could've failed and set a flag for else. Now it's not needed
+        runtime.getFlag(RUN_ELSE);
     } else {
         runtime.flag(RUN_ELSE);
     }
