@@ -110,6 +110,50 @@ The list of currently defined commands, their aliases in the parenthesis, and wh
 *  `maxterms` (`max`): Prints the maxterms of the Boolean function expression passed.
 *  `variables` (`v`): Prints the variables that the passed Boolean function is a function of in little endian format (highest index variable is the leftmost, lowest is the rightmost).
 *  `quit` (`q`): In the interactive mode, quits the shell. If used in a script, will stop execution.
+*  `if`/`else`/`else if` : Flow control commands. Work as you would expect them to. The condition to the `if` must be an expression that evaluates to a constant value Boolean function. e.g.:
+
+```
+if 0 { # You can use constants
+    print a & b;
+} else if !1 { # Or use operators
+    print c & d;
+} else if 0 {
+    if ((p & h)[0]) { # Using parenthesis is optional
+        print p & h;
+    }
+} else if (h | d)[3] { # As long as the result is a constant function
+    if 1 {
+    	 # The flow control will reach here and print (h | d)'s truth table
+        print h | d;
+    } else {
+        print !1;
+    }
+}
+```
+*  `while` : Loop command. Works as you would expect it to. The condition argument abides by the same rules as the flow control commands above. e.g.:   
+
+```
+let x = a & b;
+# Will iterate 3 times
+while !$x[0] {
+    if !$x[1] & !$x[2] & $x[3] {
+        # First iteration here
+        let x = $x | b;
+    } else if !$x[1] & $x[2] & $x[3] {
+        # Second iteration here
+        let x = $x | a;
+    } else if $x[1] & $x[2] & $x[3] {
+        # Third iteration here. The loop will break after this
+        let x = $x | 1;
+    }
+}
+
+# The function was or-ed with 1 in the last iteration, 
+# so the output will be a truthtable of a function of (a, b) that's always 1
+p $x;
+```
+
+**Note**: The flow control and loop commands described above are valid logic commands as well, and abide by the same grammar: the first word is the command name, and the rest of the line consists of the arguments to that command. Now these arguments can be logic code wrapped in curly braces (as for `else`), be an evaluation condition + logic code in curly braces (as for `if` or `while`), or be a selectively allowed logic command + any commands that this command may require (as for `else`, when used in the `else if <condition> { <code> }` format). The only exception here is that a closing curly brace `}` does not need to be followed by a `;` explicitly; there is an implicit `;` after it. So even if you put `;` after all the closing braces in the examples above, the result will be the same. 
 
 ###Operators
 * `&`: Binary operator 'and'
