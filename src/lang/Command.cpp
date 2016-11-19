@@ -183,10 +183,7 @@ bool ElseCommand::execute(const string &args, Runtime &runtime, ostream &out, fu
         throw CommandNotAllowedException("'else' command cannot be used without a preceding 'if' command.");
     }
 
-    if (!runtime.getFlag(RUN_ELSE)) {
-        return true;
-    }
-
+    bool runElse = runtime.getFlag(RUN_ELSE);
     Command::execute(args, runtime, out, interpreter);
     UNUSED(out);
 
@@ -200,12 +197,26 @@ bool ElseCommand::execute(const string &args, Runtime &runtime, ostream &out, fu
     const string condition = sm[1];
     const string code = sm[2];
 
-    if (isWhitespace(condition)) {
-        stringstream ss;
-        ss << code;
-        return interpreter(ss);
-    } else {
-        throw BadCommandArgumentsException("Else if conditions are coming soon");
+    if (!runElse) {
+        // A previous if condition was true, so don't execute this else
+        if (!isWhitespace(condition)) {
+            // If this was an else-if, allow more else conditions. Just don't run them (RUN_ELSE is not set)
+            runtime.flag(ELSE_ALLOWED);
+        }
+        return true;
     }
+
+    // Hack: This is just a one off, but if there are more like these, consider coming up with a more elegant solution
+    stringstream ss;
+    if (isWhitespace(condition)) {
+        ss << code;
+    } else if (condition.compare(0, strlen("if"), "if") == 0) {
+        // repack
+        ss << condition << " { " << code << " }";
+    } else {
+        throw BadCommandArgumentsException("Expected a conditional 'if' or unconditional block after the 'else' command.");
+    }
+
+    return interpreter(ss);
 }
 }
