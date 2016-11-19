@@ -3,6 +3,7 @@
 
 Logic is a domain specific scripting language/tool for doing Boolean Function manipulations. It is also a C++ library for doing these manipulations in your own application (the `core` module inside).
 
+If you have any suggestions, feature requests, or improvements in mind, please leave an issue or submit a PR if you've already implemented it ;).
 
 ##Building and Installing
 
@@ -268,4 +269,4 @@ Marks the end of line of code. The first whitespace (if any) separated word betw
 Everything that follows until a new line is a comment.
 
 ---
-Congrats, you made it through! I'll be adding more features, and keeping this Readme updated. If you have any suggestions and/or improvements, please leave an issue or submit a PR.
+Congrats, you made it through! I'll be adding more features, and keeping this Readme updated.
