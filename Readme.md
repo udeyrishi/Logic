@@ -104,7 +104,21 @@ The first word in every line of Logic code is a command. Everything that follows
 
 The list of currently defined commands, their aliases in the parenthesis, and what they do:
 
-* `let` (`l`): Defines a new Boolean function in the current workspace, or overwrites an existing one with the same name.
+* `let` (`l`): This comand is used for declaring new Boolean functions, overwriting existing Boolean functions, or updating certain values in a truthtable. e.g.:
+
+```
+>> let x = a & b; # Create new function
+>> let x = a | c; # Overwrite x;
+>> let $x[0] = 1; # Update the truthtable
+>> p $x
+| c | a |
+-----------
+| 0 | 0 | 1
+| 0 | 1 | 1
+| 1 | 0 | 1
+| 1 | 1 | 1
+```
+
 * `print` (`p`): If the passed Boolean Function is a constant value function, then prints the constant value. Else, prints the truth table. The header of the truth table is the list of variables in little endian format (highest index variable is the leftmost, lowest is the rightmost).
 *  `delete` (`d`): Deletes the Boolean function with the specified name from the current workspace.
 *  `minterms` (`min`): Prints the minterms of the Boolean function expression passed.
