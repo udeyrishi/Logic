@@ -38,7 +38,7 @@ public:
 };
 
 DECLARE_COMMAND_CLASS(Quit);
-DECLARE_COMMAND_CLASS(CreateBooleanFunction);
+DECLARE_COMMAND_CLASS(Let);
 DECLARE_COMMAND_CLASS(PrintBooleanFunction);
 DECLARE_COMMAND_CLASS(DeleteBooleanFunction);
 DECLARE_COMMAND_CLASS(PrintMinterms);

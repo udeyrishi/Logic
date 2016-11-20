@@ -56,7 +56,7 @@ bool QuitCommand::execute(const string &args, Runtime &runtime, ostream &out, fu
     return false;
 }
 
-bool CreateBooleanFunctionCommand::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
+bool LetCommand::execute(const string &args, Runtime &runtime, ostream &out, function<bool (istream &)> interpreter) {
     Command::execute(args, runtime, out, interpreter);
     UNUSED(out);
     UNUSED(interpreter);

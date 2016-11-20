@@ -42,7 +42,7 @@ inline DispatchTable createDispatchTableWithAllCommands() {
     DispatchTable dispatchTable;
     // See lang/Command.hpp for the list of available commands
     REGISTER_COMMAND(Quit, "quit", "q");
-    REGISTER_COMMAND(CreateBooleanFunction, "let", "l");
+    REGISTER_COMMAND(Let, "let", "l");
     REGISTER_COMMAND(PrintBooleanFunction, "print", "p");
     REGISTER_COMMAND(DeleteBooleanFunction, "delete", "d");
     REGISTER_COMMAND(PrintMinterms, "minterms", "min");
