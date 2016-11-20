@@ -19,6 +19,7 @@
 #include <core/BooleanFunctionParser.hpp>
 #include <lang/Exceptions.hpp>
 #include <core/Utils.hpp>
+#include <core/Operators.hpp>
 #include <algorithm>
 #include <sstream>
 #include <utility>
@@ -26,7 +27,6 @@
 using namespace std;
 
 namespace Logic {
-static const regex CREATE_ARGS_REGEX("\\s*(" + VARIABLE_REGEX + ")\\s*[=]\\s*(.+)\\s*");
 static const string ELSE_ALLOWED = "else_allowed";
 static const string RUN_ELSE = "run_else";
 
@@ -61,12 +61,27 @@ bool CreateBooleanFunctionCommand::execute(const string &args, Runtime &runtime,
     UNUSED(out);
     UNUSED(interpreter);
 
+    static const regex createArgsRegex("\\s*(.+?)\\s*[=]\\s*(.+)\\s*");
     smatch sm;
-    if (regex_match(args, sm, CREATE_ARGS_REGEX, regex_constants::match_continuous)) {
-        string variableName = sm[1];
-        string expression = sm[2];
-        runtime.save(variableName, parse(expression, runtime));
-        return true;
+    if (regex_match(args, sm, createArgsRegex, regex_constants::match_continuous)) {
+        string lhs = sm[1];
+        string rhs = sm[2];
+
+        static regex variableNameRegex(VARIABLE_REGEX);
+        sm = smatch();
+        if (regex_match(lhs, sm, variableNameRegex, regex_constants::match_continuous)) {
+            runtime.save(lhs, parse(rhs, runtime));
+            return true;
+        }
+
+        static regex indexAccessRegex("[\\$]{1}(" + VARIABLE_REGEX + ")" + "[\\s]*" + INDEX_REGEX + "[\\s]*");
+        sm = smatch();
+        if (regex_match(lhs, sm, indexAccessRegex, regex_constants::match_continuous)) {
+            string variableName = sm[1];
+            TruthTableUInt truthTableIndex = stoul(sm[2]);
+            runtime.get(variableName).getTruthTable()[truthTableIndex] = parse(rhs, runtime).getConstantValue();
+            return true;
+        }
     }
 
     throw BadCommandArgumentsException("Unknown args to command 'let': " + args);
