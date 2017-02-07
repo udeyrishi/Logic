@@ -107,7 +107,7 @@ static vector<TruthTableVariablesUInt> findMatches(const TCollection &source, co
 static TruthTableUInt match(TruthTableUInt in, const vector<TruthTableVariablesUInt> &matches, TruthTableVariablesUInt numVariables) {
     TruthTableUInt result = 0;
     for (TruthTableVariablesUInt i = 0; i < numVariables; ++i) {
-        result += ((in & (1 << i)) >> i) << matches[i];
+        result += ((in & (1ull << i)) >> i) << matches[i];
     }
     return result;
 }
