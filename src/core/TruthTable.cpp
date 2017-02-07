@@ -19,6 +19,8 @@
 #include <core/Exceptions.hpp>
 #include <algorithm>
 #include <unordered_set>
+#include <set>
+#include <map>
 
 namespace Logic {
 static bool isPowerOfTwo(TruthTableUInt n) {
@@ -78,9 +80,55 @@ vector<TruthTableUInt> TruthTable::getMaxterms() const {
     return maxterms;
 }
 
+template <typename TCollection, typename TValue>
+static vector<TruthTableVariablesUInt> findMatches(const TCollection &source, const TCollection &destination) {
+    if (source.size() != destination.size()) {
+        throw invalid_argument("The source and destination must have the same size.");
+    }
+
+    map<TValue, TruthTableVariablesUInt> destinationIndexMap;
+    TruthTableVariablesUInt i = 0;
+    for (const TValue &value : destination) {
+        destinationIndexMap.insert(pair<const TValue&, TruthTableVariablesUInt>(value, i++));
+    }
+
+    vector<TruthTableVariablesUInt> matches;
+
+    for (const TValue &value : source) {
+        auto searchResult = destinationIndexMap.find(value);
+        if (searchResult == destinationIndexMap.end()) {
+            throw invalid_argument("The source and destination must contain the same values.");
+        }
+        matches.push_back(searchResult->second);
+    }
+    return matches;
+}
+
+static TruthTableUInt match(TruthTableUInt in, const vector<TruthTableVariablesUInt> &matches, TruthTableVariablesUInt numVariables) {
+    TruthTableUInt result = 0;
+    for (TruthTableVariablesUInt i = 0; i < numVariables; ++i) {
+        result += ((in & (1 << i)) >> i) << matches[i];
+    }
+    return result;
+}
+
 bool operator==(const TruthTable &left, const TruthTable &right) {
-    return left.getVariables() == right.getVariables() &&
-           left.values == right.values;
+    bool sameVariables = set<string>(left.getVariables().begin(), left.getVariables().end()) ==
+                         set<string>(right.getVariables().begin(), right.getVariables().end());
+    if (!sameVariables) {
+        return false;
+    }
+
+    const vector<TruthTableVariablesUInt> matches = findMatches<vector<string>, string>(left.getVariables(), right.getVariables());
+
+    for (TruthTableUInt i = 0; i < left.size(); ++i) {
+        TruthTableUInt j = match(i, matches, left.getVariables().size());
+        if (left[i] != right[j]) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void TruthTable::validateIndex(const TruthTableUInt index) const {

@@ -44,8 +44,8 @@ namespace Logic {
     }
 
     template <typename TCollection, typename TValue>
-    bool contains(TCollection collection, TValue item) {
-        for (TValue value : collection) {
+    bool contains(const TCollection &collection, const TValue &item) {
+        for (const TValue &value : collection) {
             if (value == item) {
                 return true;
             }
