@@ -5,7 +5,7 @@ Logic is a domain specific scripting language/tool for doing Boolean Function ma
 
 If you have any suggestions, feature requests, or improvements in mind, please leave an issue or submit a PR if you've already implemented it ;).
 
-##Building and Installing
+## Building and Installing
 
 Requirements:
 
@@ -18,20 +18,20 @@ Requirements:
 
 ```sh
 # To install logic in /usr/local/bin
-./install.sh
+$ ./install.sh
 ```
 
 Or, to just build:
 
 ```sh
 # This will put the binaries in ./bin
-cmake . && make logic
+$ cmake . && make logic
 
 # To compile the logic_tests executable
-cmake . && make logic_tests
+$ cmake . && make logic_tests
 ```
 
-##Running
+## Running
 Assuming the `logic` binary is in your path:
 
 ```sh
@@ -49,7 +49,7 @@ Usage:
 $ path/to/binary/logic_tests
 ```
 
-##Language basics
+## Language basics
 
 Let's look at some simple sample code:
 
@@ -99,7 +99,7 @@ This will output:
 
 `$foo` here is a special constant value Boolean function.
 
-###Commands
+### Commands
 The first word in every line of Logic code is a command. Everything that follows is passed to that command as arguments. Different commands expect different number of arguments.
 
 The list of currently defined commands, their aliases in the parenthesis, and what they do:
@@ -170,7 +170,7 @@ p $x;
 
 **Note**: The flow control and loop commands described above are valid logic commands as well, and abide by the same grammar: the first word is the command name, and the rest of the line consists of the arguments to that command. Now these arguments can be logic code wrapped in curly braces (as for `else`), be an evaluation condition + logic code in curly braces (as for `if` or `while`), or be a selectively allowed logic command + any commands that this command may require (as for `else`, when used in the `else if <condition> { <code> }` format). The only exception here is that a closing curly brace `}` does not need to be followed by a `;` explicitly; there is an implicit `;` after it. So even if you put `;` after all the closing braces in the examples above, the result will be the same. 
 
-###Operators
+### Operators
 * `&`: Binary operator 'and'
 * `|`: Binary operator 'or'
 * `^`: Binary opertor 'xor'
@@ -235,7 +235,7 @@ Here, `x` is the function `(a & b) | c`, when `b` is true and `a` is false. That
 Note: You should always use parenthesis to specify the operator precedence, because there is no agreed upon natural precedence between the different binary operators (unary operators have a natural precedence--they apply to the immediately following operand (or preceding, as is the case for the `[]` operator)). For instance: `a | (b & d | !c) & c` can be interpreted as `(a | ((b & d) | !c)) & c` if using _greedy_ precedence, or as `a | ((b & (d | !c)) & c)` if using the _lazy_ precedence.
 The convention here is to use the latter _lazy_ one.
 
-###Special tokens
+### Special tokens
 There are some special tokens that you can use in a Boolean function:
 
 #### `$` (the dollar sign)
